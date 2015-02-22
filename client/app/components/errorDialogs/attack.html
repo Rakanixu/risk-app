@@ -1,0 +1,11 @@
+<div>
+	<p>Attacking from <span class="strong blue">{{reg1}}</span> to <span class="strong red">{{reg2}}</span></p>
+	<span>Select unit's number to attack with: </span>
+	<select ng-change="onchange(attackingQty)" ng-model="attackingQty" ng-options="attack.display for attack in attackWith">
+		<option value="">Select quantity</option>
+	</select>
+	<div>
+		<button nf-if="attackingQty" type="button" ng-click="resolveAttack()">Attack</button>
+		<button type="button" ng-click="closeThisDialog()">Cancel</button>
+	</div>
+</div>

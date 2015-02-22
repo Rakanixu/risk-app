@@ -1,0 +1,350 @@
+area {
+	cursor: pointer;
+}
+
+button {
+	background-color: rgb(255, 161, 0);
+	border-radius: 5px;
+	min-width:100px;
+	min-height: 25px;
+}
+
+map div img  {
+	width: 15px;
+	border-radius: 15px;
+}
+
+map div img.cannon  {
+	width: 30px;
+	border-radius: 10px;
+	height: 25px;
+}
+
+.info-panel {
+    float: left;
+    width: 148px;
+}
+
+.container {
+	padding: 10px;
+	border: 3px solid #800F00;
+	border-radius: 7px;
+}
+
+.wood {
+	background: url(../img/wood.jpg);
+}
+
+.dice-label {
+	position: relative;
+	top: -15px;
+	width: 120px;
+	display: inline-block;
+}
+	
+.dice {
+	background-size: 50px 50px;
+	width: 50px;
+	height: 50px;
+	display: inline-block;
+	margin-right: 15px;
+}
+
+.dice1 {
+	background-image: url("../img/dice1.png");
+}
+
+.dice2 {
+	background-image: url("../img/dice2.png");
+}
+
+.dice3 {
+	background-image: url("../img/dice3.png");
+}
+
+.dice4 {
+	background-image: url("../img/dice4.png");
+}
+
+.dice5 {
+	background-image: url("../img/dice5.png");
+}
+
+.dice6 {
+	background-image: url("../img/dice6.png");
+}
+
+.strong {
+	font-weight: 600;
+}
+
+.blue {
+	color: #1B02FF;
+}
+
+.red {
+	color: #F00;
+}
+
+.game-map {
+	width: 1200px !important;
+	height: auto;
+	float:left;
+}
+
+.alaska {
+	position:absolute;
+	top: 100px;
+	left: 45px;
+}
+
+.alaska {
+	position:absolute;
+	top: 100px;
+	left: 45px;
+}
+
+.northwest {
+	position:absolute;
+	top: 100px;
+	left: 140px;
+}
+
+.alberta {
+	position:absolute;
+	top: 170px;
+	left: 130px;
+}
+
+.greenland {
+	position:absolute;
+	top: 50px;
+	left: 350px;
+}
+
+.ontario {
+	position:absolute;
+	top: 170px;
+	left: 220px;
+}
+
+.quebec {
+	position:absolute;
+	top: 180px;
+	left: 300px;
+}
+
+.westernuuee {
+	position:absolute;
+	top: 260px;
+	left: 140px;
+}
+
+.easternuuee {
+	position:absolute;
+	top: 270px;
+	left: 240px;
+}
+
+.centralamerica {
+	position:absolute;
+	top: 355px;
+	left: 160px;
+}
+
+.venezuela {
+	position:absolute;
+	top: 440px;
+	left: 240px;
+}
+
+.peru {
+	position:absolute;
+	top: 545px;
+	left: 240px;
+}
+
+.brazil {
+	position:absolute;
+	top: 495px;
+	left: 300px;
+}
+
+.argentina {
+	position:absolute;
+	top: 630px;
+	left: 270px;
+}
+
+.northafrica {
+	position:absolute;
+	top: 480px;
+	left: 500px;
+}
+
+.egypt {
+	position:absolute;
+	top: 450px;
+	left: 600px;
+}
+
+.eastafrica {
+	position:absolute;
+	top: 530px;
+	left: 660px;
+}
+
+.congo {
+	position:absolute;
+	top: 600px;
+	left: 590px;
+}
+
+.southafrica {
+	position:absolute;
+	top: 680px;
+	left: 610px;
+}
+
+.madagascar {
+	position:absolute;
+	top: 700px;
+	left: 740px;
+}
+
+.iceland {
+	position:absolute;
+	top: 140px;
+	left: 480px;
+}
+
+.scandinavia {
+	position:absolute;
+	top: 150px;
+	left: 560px;
+}
+
+.ukraine {
+	position:absolute;
+	top: 170px;
+	left: 670px;
+}
+
+.greatbritain {
+	position:absolute;
+	top: 235px;
+	left: 450px;
+}
+
+.westerneurope {
+	position:absolute;
+	top: 365px;
+	left: 475px;
+}
+
+.northerneurope {
+	position:absolute;
+	top: 250px;
+	left: 570px;
+}
+
+.southerneurope {
+	position:absolute;
+	top: 320px;
+	left: 570px;
+}
+
+.middleeast {
+	position:absolute;
+	top: 380px;
+	left: 700px;
+}
+
+.afghanistan {
+	position:absolute;
+	top: 280px;
+	left: 770px;
+}
+
+.ural {
+	position:absolute;
+	top: 170px;
+	left: 800px;
+}
+
+.siberia {
+	position:absolute;
+	top: 100px;
+	left: 850px;
+}
+
+.yakustk {
+	position:absolute;
+	top: 70px;
+	left: 960px;
+}
+
+.irkutsk {
+	position:absolute;
+	top: 180px;
+	left: 945px;
+}
+
+.kamchatka {
+	position:absolute;
+	top: 80px;
+	left: 1045px;
+}
+
+.mongolia {
+	position:absolute;
+	top: 260px;
+	left: 930px;
+}
+
+.japan {
+	position:absolute;
+	top: 260px;
+	left: 1095px;
+}
+.china {
+	position:absolute;
+	top: 330px;
+	left: 900px;
+}
+
+.india {
+	position:absolute;
+	top: 400px;
+	left: 840px;
+}
+
+.siam {
+	position:absolute;
+	top: 430px;
+	left: 940px;
+}
+
+.indonesia {
+	position:absolute;
+	top: 580px;
+	left: 940px;
+}
+
+.newguinea {
+	position:absolute;
+	top: 540px;
+	left: 1060px;
+}
+
+.westernaustralia {
+	position:absolute;
+	top: 695px;
+	left: 990px;
+}
+
+.easternaustralia {
+	position:absolute;
+	top: 660px;
+	left: 1080px;
+}

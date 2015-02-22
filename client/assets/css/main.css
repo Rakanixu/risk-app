@@ -1,0 +1,17 @@
+html {
+	min-height:100vh;
+	font-size: 20px;
+	background: -webkit-linear-gradient(#FFA500, #FFC04D);
+	background: -o-linear-gradient(#FFA500, #FFC04D); 
+	background: -moz-linear-gradient(#FFA500, #FFC04D);
+	background: linear-gradient(#FFA500, #FFC04D);
+}
+
+body {
+	margin: 0;
+}
+
+main {
+	width: 100%;
+	overflow: hidden;
+}

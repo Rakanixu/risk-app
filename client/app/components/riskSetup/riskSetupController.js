@@ -1,0 +1,81 @@
+'use strict';
+/**
+ *  Game set up controller
+ */
+app.controller('RiskSetupController', function($scope, $location, Risk, blockUI, ngDialog) {
+	// Block the user interface
+    blockUI.start();
+
+    // Ensures every set up is completly new. Service maintain the data if one connection with the server is lost and afterwards,
+    // another user connects. The user who did not reconnect (waiting) had values from previous game
+    Risk.setGraph(new MapGraph());
+    // Binds our scope with the view
+    Risk.initViewBind($scope);
+	$scope.turn = Risk.getMessage('setUp');
+	$scope.waitMessage = Risk.getMessage('waitSetUp');
+	$scope.lastAction = '';
+	$scope.initGame = false;
+
+    var refreshView = function(region) {
+    	$scope.mapTriggerWatcher = region;
+    };
+
+	/**
+	 * Server asign to client its turn and pass the updated graph
+	 */
+	Socket.on('turnSetupStarted', function(graph, region, armiesLeft) {
+		Risk.setGraph(graph);
+		$scope.$apply(function() {
+			refreshView(region);
+			$scope.turn = Risk.getMessage('armiesLeft', armiesLeft); 
+			$scope.waitMessage = Risk.getMessage('turnSetUp');
+			if (region) $scope.lastAction = Risk.getMessage('placedArmy', region);
+			blockUI.stop();
+		});
+	});
+
+	/**
+	 * Server sends data from other clientsto be updated on client
+	 * When event fired, UI should be blocked and should remain like that
+	 */
+	Socket.on('updateGraph', function(graph, region) {
+		Risk.setGraph(graph);
+		$scope.$apply(function() {
+			refreshView(region);
+			$scope.waitMessage = Risk.getMessage('turnSetUp');
+			if (region) $scope.lastAction = Risk.getMessage('placedArmy', region);
+		});
+	});
+
+	/**
+	 * game setup phase finished
+	 * Route to Risk
+	 */
+	Socket.on('setupPhaseFinished', function(graph) {
+		Risk.setGraph(graph);
+		$scope.$apply(function() {
+			blockUI.stop();
+			$location.path('/risk');
+		});
+	});
+
+	/**
+	 * If UI not blocked, this user is allowed to place an army
+	 * After place army, an event is sent to server to notice following user can do the same
+	 */
+	$scope.onclick = function($event) {
+		var region = $event.target.title;
+
+		// Sets the army if allowed
+		if (Risk.setArmy(region, 1)) {
+			refreshView(region);
+			$scope.waitMessage = Risk.getMessage('waitSetUp');
+			blockUI.start();
+			Socket.emit('turnSetupFinished', Risk.getGraph(), region);			
+		} else {
+			ngDialog.open({ 
+				template: 'client/app/components/errorDialogs/freeRegionAvailable.html'
+			});
+		}
+	};
+});

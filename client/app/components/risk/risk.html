@@ -1,0 +1,174 @@
+<!-- SetUpController is called to manage disconnections during the game -->
+<div ng-controller="HandshakeController as handshake"></div>
+<img class="game-map" src="client/assets/img/map.jpg" alt="World map" usemap="#map"/>
+<map name="map" risk-setup-directive>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.alaska.regionClass" class="alaska" alt="Alaska" title="alaska" shape="poly" coords="105,86,103,138,113,145,122,177,116,192,75,151,26,180,16,122,33,87,67,72" />
+		<div class="alaska"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.northwest.regionClass" class="northwest" alt="North West" title="northwest" shape="poly" coords="109,85,114,140,216,148,251,148,303,99,279,54,231,83,163,78" />
+		<div class="northwest"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.alberta.regionClass" class="alberta" alt="Alberta" title="alberta" shape="poly" coords="118,144,215,152,209,224,127,226,121,196,129,173" />
+		<div class="alberta"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.greenland.regionClass" class="greenland" alt="Greenland" title="greenland" shape="poly" coords="316,76,365,104,391,169,460,97,474,28,406,10,350,33,324,57" />
+		<div class="greenland"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.ontario.regionClass" class="ontario" alt="Ontario" title="ontario" shape="poly" coords="214,152,212,222,263,224,283,246,287,210,279,186,248,152" />
+		<div class="ontario"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.quebec.regionClass" class="quebec" alt="Quebec" title="quebec" shape="poly" coords="288,190,290,244,319,248,332,241,338,274,356,244,348,225,381,203,352,155,331,134,304,135" />
+		<div class="quebec"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.westernuuee.regionClass" class="westernuuee" alt="Western UUEE" title="westernuuee" shape="poly" coords="125,225,231,228,231,286,208,289,189,336,178,340,125,311" />
+		<div class="westernuuee"></div>
+	</div>	
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.easternuuee.regionClass" class="easternuuee" alt="Eastern UUEE" title="easternuuee" shape="poly" coords="234,228,247,231,258,244,255,267,282,254,301,253,327,253,326,270,283,363,264,366,256,345,201,354,192,342,218,289,230,286,233,280" />
+		<div class="easternuuee"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.centralamerica.regionClass" class="centralamerica" alt="Central America" title="centralamerica" shape="poly" coords="129,320,153,380,216,450,233,428,229,374,195,378,199,360,187,345" />
+		<div class="centralamerica"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.venezuela.regionClass" class="venezuela" alt="Venezuela" title="venezuela" shape="poly" coords="259,417,214,465,262,496,269,473,295,464,313,473,341,470,354,458,310,426" />
+		<div class="venezuela"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.peru.regionClass" class="peru" alt="Peru" title="peru" shape="poly" coords="213,472,198,516,279,592,326,617,345,608,315,550,274,526,257,534,233,512,251,499" />
+		<div class="peru"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.brazil.regionClass" class="brazil" alt="Brazil" title="brazil" shape="poly" coords="357,463,321,479,292,474,275,480,268,495,242,511,258,521,282,529,321,553,348,603,341,629,355,654,441,516,414,489" />
+		<div class="brazil"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.argentina.regionClass" class="argentina" alt="Argentina" title="argentina" shape="poly" coords="260,591,260,731,287,781,311,780,306,703,351,658,328,624" />
+		<div class="argentina"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.northafrica.regionClass" class="northafrica" alt="North Africa" title="northafrica" shape="poly" coords="596,414,502,425,467,477,472,539,505,576,578,596,613,590,613,562,636,547,637,505,590,481,577,455" />
+		<div class="northafrica"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.egypt.regionClass" class="egypt" alt="Egypt" title="egypt" shape="poly" coords="598,433,587,457,605,482,638,503,650,491,693,486,686,458,671,444" />
+		<div class="egypt"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.eastafrica.regionClass" class="eastafrica" alt="East Africa" title="eastafrica" shape="poly" coords="647,502,641,549,662,583,694,586,672,640,686,665,713,654,727,609,763,550,729,548,700,495" />	
+		<div class="eastafrica"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.congo.regionClass" class="congo" alt="Congo" title="congo" shape="poly" coords="637,552,617,567,619,594,580,602,590,628,636,645,664,660,665,633,687,591,651,583" />
+		<div class="congo"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.southafrica.regionClass" class="southafrica" alt="South Africa" title="southafrica" shape="poly" coords="593,639,616,777,649,781,686,729,716,686,714,662,684,680,680,663,658,665" />	
+		<div class="southafrica"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.madagascar.regionClass" class="madagascar" alt="Madagascar" title="madagascar" shape="poly" coords="735,693,723,748,746,761,791,677,777,656" />
+		<div class="madagascar"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.iceland.regionClass" class="iceland" alt="Iceland" title="iceland" shape="poly" coords="475,132,473,136,475,173,513,173,540,152,516,129" />
+		<div class="iceland"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.scandinavia.regionClass" class="scandinavia" alt="Scandinavia" title="scandinavia" shape="poly" coords="547,158,617,92,652,94,653,165,620,174,591,214,565,196,546,193" />
+		<div class="scandinavia"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.ukraine.regionClass" class="ukraine" alt="Ukraine" title="ukraine" shape="poly" coords="659,98,786,99,784,226,731,242,724,265,740,293,741,345,714,352,679,327,651,328,632,283,647,250,622,218,657,162" />
+		<div class="ukraine"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.greatbritain.regionClass" class="greatbritain" alt="Great Britain" title="greatbritain" shape="poly" coords="478,190,421,279,461,297,520,280,520,254" />
+		<div class="greatbritain"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.westerneurope.regionClass" class="westerneurope" alt="Western Europe" title="westerneurope" shape="poly" coords="528,287,477,311,486,345,451,352,459,412,516,419,538,392,548,356,537,329,546,311" />	
+		<div class="westerneurope"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.northerneurope.regionClass" class="northerneurope" alt="Northern Europe" title="northerneurope" shape="poly" coords="536,278,563,213,585,224,619,227,637,250,614,310,600,314,598,290,578,297,569,310,551,309" />
+		<div class="northerneurope"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.southerneurope.regionClass" class="southerneurope" alt="Southern Europe" title="southerneurope" shape="poly" coords="550,317,553,355,570,385,553,401,630,407,638,344,645,330,632,295,619,312,595,318,596,301,582,303,571,313" />
+		<div class="southerneurope"></div>
+	</div>
+	<div>
+		<area ng-click="onclick($event)" ng-class="map.middleeast.regionClass" class="middleeast" alt="Middle East" title="middleeast" shape="poly" coords="768,355,767,363,744,354,694,360,645,352,634,391,685,400,687,456,738,520,790,507,804,465,811,424,791,362" />
+		<div class="middleeast"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.afghanistan.regionClass" class="afghanistan" alt="Afghanistan" title="afghanistan" shape="poly" coords="736,240,742,289,770,350,802,358,842,334,855,279,813,250,793,226" />
+		<div class="afghanistan"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.ural.regionClass" class="ural" alt="Ural" title="ural" shape="poly" coords="786,56,793,218,862,269,877,246,846,204,856,183,827,113" />
+		<div class="ural"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.siberia.regionClass" class="siberia" alt="Siberia" title="siberia" shape="poly" coords="811,70,856,159,861,209,882,249,911,268,908,238,892,224,911,181,932,183,937,153,920,102,945,80,940,52,912,28,867,24,842,35" />
+		<div class="siberia"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.yakutsk.regionClass" class="yakustk" alt="Yakutsk" title="yakustk" shape="poly" coords="945,47,946,95,930,104,945,147,985,133,1003,104,1021,109,1026,97,1018,76,1037,54,1004,42" />
+		<div class="yakustk"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.irkutsk.regionClass" class="irkutsk" alt="Irkutsk" title="irkutsk" shape="poly" coords="943,154,939,189,916,189,904,224,929,236,979,233,983,206,1001,207,1024,232,1026,201,1003,195,999,183,984,168,984,139" />
+		<div class="irkutsk"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.kamchatka.regionClass" class="kamchatka" alt="Kamchatka" title="kamchatka" shape="poly" coords="1048,54,1046,55,1033,105,1002,114,990,145,1008,186,1031,200,1031,223,1029,244,1048,262,1059,223,1037,172,1024,157,1072,146,1092,195,1103,197,1107,136,1156,95,1124,68" />
+		<div class="kamchatka"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.mongolia.regionClass" class="mongolia" alt="Mongolia" title="mongolia" shape="poly" coords="916,237,917,280,940,306,1021,321,1050,318,1042,292,1042,270,1013,230,1000,214,982,240" />
+		<div class="mongolia"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.japan.regionClass" class="japan" alt="Japan" title="japan" shape="poly" coords="1085,206,1090,271,1057,330,1073,348,1121,298,1124,207" />
+		<div class="japan"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.china.regionClass" class="china" alt="China" title="china" shape="poly" coords="877,257,852,327,873,348,872,375,961,419,982,403,1001,428,1034,400,1035,342,1022,326,945,319" />
+		<div class="china"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.india.regionClass" class="india" alt="India" title="india" shape="poly" coords="866,347,804,367,818,423,841,452,874,536,930,409,855,375" />
+		<div class="india"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.siam.regionClass" class="siam" alt="Siam" title="siam" shape="poly" coords="936,414,924,443,976,525,1004,499,1008,467,988,429,980,415,962,428" />
+		<div class="siam"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.indonesia.regionClass" class="indonesia" alt="Indonesia" title="indonesia" shape="poly" coords="915,554,1003,536,1039,574,1033,618,1016,642,967,643" />
+		<div class="indonesia"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.newguinea.regionClass" class="newguinea" alt="New Guinea" title="newguinea" shape="poly" coords="1036,531,1067,581,1130,595,1125,557,1089,524,1047,520" />
+		<div class="newguinea"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.westernaustralia.regionClass" class="westernaustralia" alt="Western Australia" title="westernaustralia" shape="poly" coords="1056,623,971,687,995,767,1050,749,1105,763,1107,696,1059,691" />
+		<div class="westernaustralia"></div>
+	</div>
+	<div>	
+		<area ng-click="onclick($event)" ng-class="map.easternaustralia.regionClass" class="easternaustralia" alt="Eastern Australia" title="easternaustralia" shape="poly" coords="1063,620,1066,686,1113,688,1112,773,1157,779,1180,725,1159,670,1123,605" />
+		<div class="easternaustralia"></div>
+	</div>	
+</map>
+<div class="info-panel" info-panel-directive></div>

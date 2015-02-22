@@ -1,0 +1,8 @@
+<div class="container wood">	
+	<p><span class="strong">Turn: </span><span ng-bind="turn"></span></p>
+	<p ng-bind="waitMessage"></p>
+	<p ng-if="lastAction"><span class="strong" >Adversary last action: </span><span ng-bind="lastAction"></span></p>
+	<div ng-if="initGame">
+		<button type="button" ng-click="finishTurn()">Finish turn</button>
+	</div>
+</div>

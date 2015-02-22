@@ -1,0 +1,15 @@
+<div>
+	<div>
+		<span class="dice-label">Attacker: </span>
+		<!-- track by $index used to iterate when duplicate keys exists -->
+		<span class="dice attack" ng-class="dice" ng-repeat="dice in attackingDices track by $index"></span>
+	</div>
+	<div>
+		<span class="dice-label">Defender: </span>
+		<!-- track by $index used to iterate when duplicate keys exists -->
+		<span class="dice defense" ng-class="dice" ng-repeat="dice in defendingDices track by $index"></span>
+	</div>
+	<div>
+		<button type="button" ng-click="closeThisDialog()">Continue</button>
+	</div>
+<div>
