@@ -97,6 +97,17 @@ app.service('Risk', function(Handshake) {
 				return false;
 			}
 		},
+		checkAllyMovement: function(from, to) {
+			// Checks ownership of the region and army size to decide if is an allowed movement 
+			if (graph[from].link.indexOf(to) !== -1 
+					&& graph[from].owner === Handshake.getConfig().userId 
+					&& graph[to].owner === Handshake.getConfig().userId 
+					&& graph[from].armySize > 1) {
+				return true;
+			} else {
+				return false;
+			}		
+		},		
     	initViewBind: function($scope) {
 			$scope.map = {};
 			// Due to performance issues, we only watch mapTriggerWatcher instead of deep 3 level map

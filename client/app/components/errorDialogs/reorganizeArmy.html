@@ -1,0 +1,11 @@
+<div>
+	<p>Moving troops <span class="strong blue">{{reg1}}</span> to <span class="strong blue">{{reg2}}</span></p>
+	<span>Select unit's number to move to: </span>
+	<select ng-change="onchangeReorganization(moveQty)" ng-model="moveQty" ng-options="move.display for move in moveWith">
+		<option value="">Select quantity</option>
+	</select>
+	<div>
+		<button nf-if="moveQty" type="button" ng-click="resolveMovement()">Move armies</button>
+		<button type="button" ng-click="closeThisDialog()">Cancel</button>
+	</div>
+</div>

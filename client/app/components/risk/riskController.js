@@ -5,7 +5,9 @@
 app.controller('RiskController', function($scope, $timeout, $window, Handshake, Risk, Mustering, blockUI, ngDialog) {
 	var regionStack = [],
 		attackingQty = 0,
-		mustering = false;
+		moveQty = 0,
+		mustering = false,
+		reoganization = false;
 
 	// Block the user interface
     blockUI.start();
@@ -120,13 +122,39 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			closeByEscape: false,
 			showClose: false
 		});
-	};	
+	};
+	
+	// Shows dialog to confirm reorganization movement
+	var applyReorganizationMovement = function(reg1, reg2) {
+		$scope.reg1 = reg1;
+		$scope.reg2 = reg2;	
+		$scope.moveWith = [];
+		for (var i = 0; i < Risk.getGraph()[reg1].armySize - 1; i++) {
+			$scope.moveWith[i] = {
+				display: (i + 1).toString(),
+				value: i + 1
+			};
+		};
+		
+		ngDialog.open({ 
+			template: 'client/app/components/errorDialogs/reorganizeArmy.html',
+			scope: $scope,
+			overlay: false,
+			closeByDocument: false,
+			closeByEscape: false,
+			showClose: false
+		});
+	};
 
 	/**
 	 * Sets number of soldiers attacking another region
 	 */
 	$scope.onchange = function(item) {
 		attackingQty = item.value;
+	};
+	
+	$scope.onchangeReorganization = function(item) {
+		moveQty = item.value;
 	};
 
 	/**
@@ -219,11 +247,44 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	};
 	
 	/**
+	 * Manage an reorganization movement
+	 */
+	$scope.resolveMovement = function() {
+		var i,
+			region1 = $scope.reg1,
+			region2 = $scope.reg2,
+			regions = '',
+			graph = Risk.getGraph();
+			
+		// Ensure user has set a valid number of armies to move
+		if (moveQty > 0) {
+			ngDialog.close();
+			graph[region1].armySize -= moveQty;
+ 			graph[region2].armySize += moveQty;
+			Risk.setGraph(graph);
+			regions = region1 + ',' + region2;
+			$scope.mapTriggerWatcher = regions;
+			moveQty = 0;
+			// Sends to server the result to update other clients
+			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions);
+			$scope.finishTurn();
+		}			
+	};
+	
+	/**
+	 * Reorganize army. One reorganization allowed
+	 */
+	$scope.reorganizeArmy = function() {
+		reoganization = true;
+	};
+	
+	/**
 	 * Finish player's turn
 	 */
 	$scope.finishTurn = function() {
 		$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
 		Socket.emit('turnFinished', Handshake.getConfig().userId);
+		reoganization = false;
 		blockUI.start();
 	};
 
@@ -258,24 +319,40 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 					template: 'client/app/components/errorDialogs/freeRegionAvailable.html'
 				});
 			}
-		// Attacking phase
 		} else {
 			if (regionStack.length < 2) {
 				regionStack.push($event.target.title);
 			} 
-
-			if (regionStack.length === 2) {
-				var reg1 = regionStack.shift(),
-					reg2 = regionStack.shift();
-				// Validates movement and regionStack is empty again
-				if (Risk.checkMovement(reg1, reg2)) {
-					applyMovement(reg1, reg2);
-				} else {
-					ngDialog.open({ 
-						template: 'client/app/components/errorDialogs/movementNotAllowed.html'
-					});
+			
+			// Reorganization phase
+			if (reoganization) {
+				if (regionStack.length === 2) {
+					var reg1 = regionStack.shift(),
+						reg2 = regionStack.shift();
+					// Validates movement and regionStack is empty again
+					if (Risk.checkAllyMovement(reg1, reg2)) {
+						applyReorganizationMovement(reg1, reg2);
+					} else {
+						ngDialog.open({ 
+							template: 'client/app/components/errorDialogs/movementNotAllowed.html'
+						});
+					}
 				}
-			}		
+			// Attacking phase
+			} else {
+				if (regionStack.length === 2) {
+					var reg1 = regionStack.shift(),
+						reg2 = regionStack.shift();
+					// Validates movement and regionStack is empty again
+					if (Risk.checkMovement(reg1, reg2)) {
+						applyMovement(reg1, reg2);
+					} else {
+						ngDialog.open({ 
+							template: 'client/app/components/errorDialogs/movementNotAllowed.html'
+						});
+					}
+				}
+			}
 		}
 	};
 });
