@@ -112,7 +112,25 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 						// The turn is increased when all players had the turn 
 						risk.turn++;
 					}
-					this.clientSockets[turnToken % this.size].emit('turnStarted', risk.turn);
+
+					console.log('is user destroyed?? ', this.players[turnToken % this.size].userId);
+
+					if (this.checkWipedOutPlayer(this.players[turnToken % this.size].userId)) {
+						console.log('user destroyed', this.players[turnToken % this.size].userId);
+						console.log('sendind wipeOut')
+						this.clientSockets[turnToken % this.size].emit('wipedOut');
+						// Remove wiped out player from sockets pool, room and close all its listeners
+						this.players.splice(this.players.indexOf(this.players[turnToken % this.size].userId), 1);
+						this.clientSockets[turnToken % this.size].leave(this.roomName);
+						this.clientSockets[turnToken % this.size].removeAllListeners();
+						this.size--;
+						//turnToken -= 
+						console.log('giving turn to next user: ', turnToken % this.size);
+						this.clientSockets[turnToken % this.size].emit('turnStarted', risk.turn);
+					} else {
+						console.log('user is NOT destroyed', this.players[turnToken % this.size].userId);
+						this.clientSockets[turnToken % this.size].emit('turnStarted', risk.turn);
+					}
 				}
 			}.bind(this));
 		};

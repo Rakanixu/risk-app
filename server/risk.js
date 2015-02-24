@@ -10,15 +10,17 @@ module.exports = function() {
 	this.lastRegion = '';
 
 	this.checkWinningCondition = function(userId) {
-		var winner = true;
-
 		for (var region in this.graph) {
 			if (this.graph[region].owner !== userId) {
-				winner = false;
+				return false;
 				break;
 			} 
 		}
 
-		return winner;
+		return true;
 	};
+
+	this.checkWipedOutPlayer = function(userId) {
+		return !this.checkWinningCondition(userId);
+	}
 };
