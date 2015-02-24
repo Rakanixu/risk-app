@@ -5,7 +5,7 @@
  */
 module.exports = function() {
 	this.graph = null;
-	this.setUpArmySize = 22;
+	this.setUpArmySize = 2;
 	this.turn = 1;
 	this.lastRegion = '';
 
@@ -13,7 +13,6 @@ module.exports = function() {
 		for (var region in this.graph) {
 			if (this.graph[region].owner !== userId) {
 				return false;
-				break;
 			} 
 		}
 
@@ -21,6 +20,12 @@ module.exports = function() {
 	};
 
 	this.checkWipedOutPlayer = function(userId) {
-		return !this.checkWinningCondition(userId);
+		for (var region in this.graph) {
+			if (this.graph[region].owner === userId) {
+				return false;
+			} 
+		}
+
+		return true;
 	}
 };

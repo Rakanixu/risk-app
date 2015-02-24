@@ -66,8 +66,14 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 	
 		var initGame = function() {
 			this.clientSockets[turnToken].emit('turnStarted', risk.turn);
-			this.clientSockets[turnToken].on('applyMovementToParty', function(graph, regions) {
+			this.clientSockets[turnToken].on('applyMovementToParty', function(graph, regions, userId) {
 				risk.graph = graph;
+				
+				//ADD LOGIC FOR WIPED OUT PLAYERS AFTER EACH ATTACK
+				//userId is the player attacking or performing actions, cannot be wiped out at this moment
+				console.log(regions, 'region atacked ', regions.split(',')[1]);
+				//risk.checkWipedOutPlayer(userId)
+				
 				// Sends data to update on other clients with last attack
 				for (var i = 0; i < this.clientSockets.length; i++) {
 					if (i !== turnToken) {
@@ -113,24 +119,7 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 						risk.turn++;
 					}
 
-					console.log('is user destroyed?? ', this.players[turnToken % this.size].userId);
-
-					if (this.checkWipedOutPlayer(this.players[turnToken % this.size].userId)) {
-						console.log('user destroyed', this.players[turnToken % this.size].userId);
-						console.log('sendind wipeOut')
-						this.clientSockets[turnToken % this.size].emit('wipedOut');
-						// Remove wiped out player from sockets pool, room and close all its listeners
-						this.players.splice(this.players.indexOf(this.players[turnToken % this.size].userId), 1);
-						this.clientSockets[turnToken % this.size].leave(this.roomName);
-						this.clientSockets[turnToken % this.size].removeAllListeners();
-						this.size--;
-						//turnToken -= 
-						console.log('giving turn to next user: ', turnToken % this.size);
-						this.clientSockets[turnToken % this.size].emit('turnStarted', risk.turn);
-					} else {
-						console.log('user is NOT destroyed', this.players[turnToken % this.size].userId);
-						this.clientSockets[turnToken % this.size].emit('turnStarted', risk.turn);
-					}
+					this.clientSockets[turnToken % this.size].emit('turnStarted', risk.turn);
 				}
 			}.bind(this));
 		};

@@ -242,7 +242,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			$scope.mapTriggerWatcher = regions;
 			attackingQty = 0;
 			// Sends to server the result to update other clients
-			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions);
+			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions, Handshake.getConfig().userId);
 		}
 	};
 	
@@ -266,7 +266,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			$scope.mapTriggerWatcher = regions;
 			moveQty = 0;
 			// Sends to server the result to update other clients
-			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions);
+			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions, Handshake.getConfig().userId);
 			$scope.finishTurn();
 		}			
 	};
