@@ -62,22 +62,44 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 	this.initFullRoom = function() {
 		var roomClients = io.sockets.adapter.rooms[this.roomName],
 			listenerActive = [],
-			turnToken = 0; 
+			turnToken = 0,
+			initializeFirstTurn = false;
 	
 		var initGame = function() {
 			this.clientSockets[turnToken].emit('turnStarted', risk.turn);
 			this.clientSockets[turnToken].on('applyMovementToParty', function(graph, regions, userId) {
 				risk.graph = graph;
-				
-				//ADD LOGIC FOR WIPED OUT PLAYERS AFTER EACH ATTACK
-				//userId is the player attacking or performing actions, cannot be wiped out at this moment
-				console.log(regions, 'region atacked ', regions.split(',')[1]);
-				//risk.checkWipedOutPlayer(userId)
-				
+
 				// Sends data to update on other clients with last attack
 				for (var i = 0; i < this.clientSockets.length; i++) {
 					if (i !== turnToken) {
 						this.clientSockets[i].emit('applyMovement', risk.graph, regions);
+					}
+				}
+				
+				// Attacker coquested the region
+				// Checks if atacked player lost all his regions
+				if (risk.graph[regions.split(',')[1]].owner === userId) {
+					for (var i = 0; i < this.players.length; i++) {
+						if (this.players[i].userId !== userId && risk.checkWipedOutPlayer(this.players[i].userId)) {
+							// Sends losser event and remove user from room
+							this.clientSockets[i].emit('losser');
+							this.clientSockets[i].leave(this.roomName);
+							this.clientSockets[i].removeAllListeners();
+							this.clientSockets.splice(i, 1);
+							this.players.splice(i, 1);
+							this.size--;
+
+							for (var i = 0; i < this.players.length; i++) {
+								if (this.players[i].userId === userId) {
+									// turnToken is equals to the position of the user with the turn
+									// On turnFinished event will be increase for give the turn to next user
+									turnToken = i;
+									break;
+								}
+							}
+							break;
+						}
 					}
 				}
 			}.bind(this));
@@ -108,9 +130,12 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 				}
 				turnToken++;
 				// A client finish its turn, calling it for next client
-				if (turnToken < this.clientSockets.length) {
+				// Every time a player is wiped out, turnToken would be lesser than the number of players
+				// initializeFirstTurn is used to be sure any more listeners are initialize in that case.
+				if (turnToken < this.clientSockets.length && !initializeFirstTurn) {
 					initGame.call(this);
 				} else {
+					initializeFirstTurn = true;
 					// turnToken is being increase for every turn for every player.
 					// On that way we assign the turn for the desired player. 
 					// At this point server just listen to events and respond acordingly
@@ -149,7 +174,6 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 						// Turn has finished for all players. Checks if setup phase has finished
 						turnToken = 0;
 						risk.setUpArmySize--;
-						console.log(risk.setUpArmySize);
 
 						// Checks if all players setup their armies
 						if (risk.setUpArmySize > 0) {
