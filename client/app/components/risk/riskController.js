@@ -62,7 +62,15 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	 */	
 	Socket.on('applyMovement', function(graph, regions) {
 		Risk.setGraph(graph);
+
 		$scope.$apply(function() {
+			// Smoke gif is shown for 2500ms  
+			$scope.smokeAttack = regions.split(',')[0];
+			$scope.smokeDefense = regions.split(',')[1];
+			$timeout(function() {
+				$scope.smokeAttack = null;
+				$scope.smokeDefense = null;
+			}, 2500);
 			$scope.lastAction = Risk.getMessage('attack', regions);
 			$scope.mapTriggerWatcher = regions;
 		});

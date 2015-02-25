@@ -7,7 +7,7 @@
 			</span>
 			Please wait... {{room.currentPlayers}}/{{room.numOfPlayers}} connected
 		</p>
-		<div ng-show="!roomsList.clientInRoom" ng-repeat="room in roomsList.list">
+		<div ng-show="!roomsList.clientInRoom && room.players.length < room.size" ng-repeat="room in roomsList.list">
 			<p>
 				<h3>Room {{$index + 1}}</h3>
 				<span>Players: </span><span ng-bind="room.players.length">0</span>/<span ng-bind="room.size"></span>

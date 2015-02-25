@@ -35,6 +35,12 @@ map div img.cannon  {
 	background: url(../img/wood.jpg);
 }
 
+.smoke {
+	height: 50px;
+	width: 50px;
+	position: absolute;
+}
+
 .dice-label {
 	position: relative;
 	top: -15px;

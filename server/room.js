@@ -77,8 +77,8 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 					}
 				}
 				
-				// Attacker coquested the region
-				// Checks if atacked player lost all his regions
+				// Attacker conquest the region
+				// Checks if attacked player lost all his regions
 				if (risk.graph[regions.split(',')[1]].owner === userId) {
 					for (var i = 0; i < this.players.length; i++) {
 						if (this.players[i].userId !== userId && risk.checkWipedOutPlayer(this.players[i].userId)) {

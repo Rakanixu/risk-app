@@ -5,7 +5,7 @@
  */
 module.exports = function() {
 	this.graph = null;
-	this.setUpArmySize = 1;
+	this.setUpArmySize = 23;
 	this.turn = 1;
 	this.lastRegion = '';
 

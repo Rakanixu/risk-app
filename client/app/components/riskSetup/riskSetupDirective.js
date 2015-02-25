@@ -2,7 +2,7 @@
 /**
  *	Custom directive to manipulate the DOM
  */
-app.directive('riskSetupDirective', function($location, Risk, Handshake) {
+app.directive('riskSetupDirective', function($location, $compile, Risk, Handshake) {
 	var party = Handshake.getConfig().party,
 		soldierPath = 'client/assets/img/soldier.png',
 		knightPath = 'client/assets/img/knight.gif',
@@ -12,7 +12,7 @@ app.directive('riskSetupDirective', function($location, Risk, Handshake) {
 		cannonVal = Risk.getArmyVal().cannonVal,
 		target = 'div.';
 
-	var generateMarkup = function($element, region) {
+	var generateMarkup = function($element, $scope, region) {
 		if (typeof region === 'string' && region.length > 0) {
 			var colour = '',
 				style = '',
@@ -55,6 +55,7 @@ app.directive('riskSetupDirective', function($location, Risk, Handshake) {
 			for (i = 0; i < soldiers; i++) {
 				$element.find(target + region).append('<img src="' + soldierPath + '" style="' + style + '"/>');
 			}
+			$element.find(target + region).append($compile('<img ng-show="smokeAttack == \'' + region + '\' || smokeDefense == \'' + region + '\'" class="smoke" src="client/assets/img/smoke.gif"/>')($scope));
 		}
 	};
 
@@ -65,7 +66,7 @@ app.directive('riskSetupDirective', function($location, Risk, Handshake) {
 				var regions = region.split(',');
 				
 				for (var i = 0; i < regions.length; i++) {
-					generateMarkup($element, regions[i]);
+					generateMarkup($element, $scope, regions[i]);
 				}
 				// Set to empty string if same attack is repeated and value does not change
 				$scope.mapTriggerWatcher = '';
@@ -74,7 +75,7 @@ app.directive('riskSetupDirective', function($location, Risk, Handshake) {
 			// When custom path is '/risk', refresh the view with custom data model
 			if ($location.$$path === '/risk') {
 				for (var reg in Risk.getGraph()) {
-					generateMarkup($element, reg);
+					generateMarkup($element, $scope, reg);
 				}
 			}
 		}
