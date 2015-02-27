@@ -1,8 +1,6 @@
 'use strict';
 /**
   * Risk module - whole app
-  * ngRoute module injection
-  * blockUI module injection
   */
 var app = angular.module('risk', ['ngRoute', 'blockUI', 'ngDialog']);
 
