@@ -189,6 +189,15 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 				listenerActive[turnToken] = true;
 			}
 		};
+		
+		var initChat = function() {
+			for (var i = 0; i < this.clientSockets.length; i++) {
+				this.clientSockets[i].on('partyMessage', function(msg) {
+					console.log(msg);
+					io.to(this.roomName).emit('broadcastedPartyMessage', msg);
+				}.bind(this));			
+			}
+		};
 
 		// Reset sockets every time the room is initialize
 		resetSocketsRoom.call(this);
@@ -197,9 +206,10 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 		    this.clientSockets.push(io.sockets.connected[clientId]);
 		    listenerActive.push(false);
 		}
-
+		
+		// Initialize room chat
+		initChat.call(this);
 		// Setup begins
-		// Object reference is pass to the method.  
 		initSetUp.call(this);
 	};
 

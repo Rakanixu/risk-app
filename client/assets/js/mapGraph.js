@@ -20,7 +20,7 @@ var MapGraph = function() {
 		'greenland': {
 			link: ['northwest', 'ontario', 'quebec', 'iceland'],
 			continent: 'northamerica'
-		},
+		}/*,
 		'ontario': {
 			link: ['northwest', 'alberta', 'westernuuee', 'easternuuee', 'quebec', 'greenland'],
 			continent: 'northamerica'
@@ -172,6 +172,6 @@ var MapGraph = function() {
 		'easternaustralia': {
 			link: ['westernaustralia', 'newguinea'],
 			continent: 'oceania'
-		}
+		}*/
 	}
 };

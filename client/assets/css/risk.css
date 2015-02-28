@@ -20,6 +20,11 @@ map div img.cannon  {
 	height: 25px;
 }
 
+.block-ui-container {
+	width: 1200px;
+	height: 800px;
+}
+
 .info-panel {
     float: left;
     width: 148px;
