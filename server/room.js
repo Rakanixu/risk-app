@@ -52,8 +52,9 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 				party.push({
 					colour: colours[i], 
 					id: this.players[i].userId
-				})
+				});
 			}
+			
 		// Sends the colours and the players (Ids) to all clients.
 		// Client will manage how to asign colours to the oponents
 		io.to(this.roomName).emit('partyColours', party);
@@ -192,9 +193,8 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 		
 		var initChat = function() {
 			for (var i = 0; i < this.clientSockets.length; i++) {
-				this.clientSockets[i].on('partyMessage', function(msg) {
-					console.log(msg);
-					io.to(this.roomName).emit('broadcastedPartyMessage', msg);
+				this.clientSockets[i].on('partyMessage', function(msg, userId) {
+					io.to(this.roomName).emit('broadcastedPartyMessage', msg, userId);
 				}.bind(this));			
 			}
 		};

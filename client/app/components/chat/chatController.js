@@ -5,14 +5,15 @@
 app.controller('ChatController', function($scope, Chat) {
 	$scope.chat = Chat;
 	
-	console.log($scope.chat);
-	
 	/**
 	  * partyMessage event. Client receives messages from other users
 	  */
-	Socket.on('broadcastedPartyMessage', function(msg) {
+	Socket.on('broadcastedPartyMessage', function(msg, userId) {
 		$scope.$apply(function() {
-			console.log(msg);
+			Chat.history.push({
+				colour: Chat.getColour(userId),
+				value: msg
+			});
 		});
 	});
 });

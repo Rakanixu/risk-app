@@ -40,6 +40,12 @@ map div img.cannon  {
 	background: url(../img/wood.jpg);
 }
 
+.chat {
+	height: 100px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .smoke {
 	height: 50px;
 	width: 50px;
