@@ -4,7 +4,7 @@
  */
 app.controller('RiskSetupController', function($scope, $location, Risk, blockUI, ngDialog) {
 	// Block the user interface
-    blockUI.start();
+    blockUI.start('Wait for other players');
 
     // Ensures every set up is completly new. Service maintain the data if one connection with the server is lost and afterwards,
     // another user connects. The user who did not reconnect (waiting) had values from previous game
@@ -70,7 +70,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, blockUI,
 		if (Risk.setArmy(region, 1)) {
 			refreshView(region);
 			$scope.waitMessage = Risk.getMessage('waitSetUp');
-			blockUI.start();
+			blockUI.start('Wait for other players');
 			Socket.emit('turnSetupFinished', Risk.getGraph(), region);			
 		} else {
 			ngDialog.open({ 

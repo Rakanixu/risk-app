@@ -10,7 +10,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 		reoganization = false;
 
 	// Block the user interface
-    blockUI.start();
+    blockUI.start('Wait for other players');
 	Risk.initViewBind($scope);
 	$scope.turn = '1';
 	$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
@@ -293,7 +293,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 		$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
 		Socket.emit('turnFinished', Handshake.getConfig().userId);
 		reoganization = false;
-		blockUI.start();
+		blockUI.start('Wait for other players');
 	};
 
 	/**
