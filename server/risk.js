@@ -3,12 +3,12 @@
  * Risk module
  * Manage game states
  */
-module.exports = function() {
+module.exports = function(numPlayers) {
 	this.graph = null;
-	this.setUpArmySize = 2;
+	this.setUpArmySize = 2;//Math.round(70/numPlayers);
 	this.turn = 1;
 	this.lastRegion = '';
-
+	
 	this.checkWinningCondition = function(userId) {
 		for (var region in this.graph) {
 			if (this.graph[region].owner !== userId) {

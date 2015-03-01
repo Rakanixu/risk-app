@@ -16,6 +16,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
 	$scope.lastAction = '';
 	$scope.initGame = true;
+	$scope.turnActive = false;
 
 	/**
 	 * Server asign to client its turn
@@ -23,6 +24,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	Socket.on('turnStarted', function(turn) {
 		$scope.$apply(function() {
 			blockUI.stop();
+			$scope.turnActive = true;
 			if (turn) $scope.turn = turn;
 		
 			if (turn > 1) {
@@ -293,6 +295,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 		$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
 		Socket.emit('turnFinished', Handshake.getConfig().userId);
 		reoganization = false;
+		$scope.turnActive = false;
 		blockUI.start('Wait for other players');
 	};
 

@@ -4,7 +4,7 @@
  */
 module.exports = function(io, roomName, numPlayers, rooms) {
 	var Risk = require('./risk.js'),
-		risk = new Risk(),
+		risk = new Risk(numPlayers),
 		turn = 1;
 
 	this.roomName = roomName;
@@ -14,7 +14,7 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 
 	var resetSocketsRoom = function() {
 		this.clientSockets = [];
-		risk = new Risk();
+		risk = new Risk(numPlayers);
 	};
 
 	var emptyRoom = function() {
