@@ -1,5 +1,7 @@
 <div ng-controller="ChatController" class="container wood chat">	
-	<p class="strong">Room chat</p>
-	<p ng-style="{'color': message.colour}" ng-repeat="message in chat.history" ng-bind="message.value"></p>
-	<input ng-model="chat.newMessage" ng-enter="chat.sendMessage" type="text">
+	<div class="chat-container">
+		<p class="strong">Room chat</p>
+		<p ng-style="{'color': message.colour}" ng-repeat="message in chat.history" ng-bind="message.value"></p>
+		<input ng-model="chat.newMessage" ng-enter="chat.sendMessage" type="text">
+	</div>
 </div>

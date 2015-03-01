@@ -14,6 +14,9 @@ app.controller('ChatController', function($scope, Chat) {
 				colour: Chat.getColour(userId),
 				value: msg
 			});
+			angular.element('.chat').animate({
+				scrollTop: angular.element('.chat > div').height()
+			}, "slow");
 		});
 	});
 });
