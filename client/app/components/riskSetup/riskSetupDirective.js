@@ -16,6 +16,8 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 		if (typeof region === 'string' && region.length > 0) {
 			var colour = '',
 				style = '',
+				styleMargin = '',
+				margin = 0,
 				cannons = 0,
 				knights = 0,
 				possibleKnights = 0,
@@ -47,13 +49,19 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 			// $scope is not modified or binded - no need for $compile
 			$element.find(target + region).empty();
 			for (i = 0; i < cannons; i++) {
-				$element.find(target + region).append('<img class="cannon" src="' + cannonPath + '" style="' + style + '"/>');
+				styleMargin = 'margin-left:' + margin + 'px';
+				$element.find(target + region).append('<img class="cannon" src="' + cannonPath + '" style="' + style + styleMargin + '"/>');
+				margin += 15;
 			}
 			for (i = 0; i < knights; i++) {
-				$element.find(target + region).append('<img src="' + knightPath + '" style="' + style + '"/>');
+				styleMargin = 'margin-left:' + margin + 'px';
+				$element.find(target + region).append('<img src="' + knightPath + '" style="' + style + styleMargin + '"/>');								
+				margin += 15;
 			}
 			for (i = 0; i < soldiers; i++) {
-				$element.find(target + region).append('<img src="' + soldierPath + '" style="' + style + '"/>');
+				styleMargin = 'margin-left:' + margin + 'px';
+				$element.find(target + region).append('<img src="' + soldierPath + '" style="' + style + styleMargin + '"/>');
+				margin += 15;
 			}
 			$element.find(target + region).append($compile('<img ng-show="smokeAttack == \'' + region + '\' || smokeDefense == \'' + region + '\'" class="smoke" src="client/assets/img/smoke.gif"/>')($scope));
 		}

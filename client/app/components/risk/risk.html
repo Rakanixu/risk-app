@@ -1,5 +1,6 @@
 <!-- SetUpController is called to manage disconnections during the game -->
-<div ng-controller="HandshakeController as handshake"></div>
+<div ng-controller="HandshakeController as handshake" chat-directive></div>
+<div block-ui="myBlockUI" class="risk-overlay"></div>
 <img class="game-map" src="client/assets/img/map.jpg" alt="World map" usemap="#map"/>
 <map name="map" risk-setup-directive>
 	<div>
@@ -171,5 +172,4 @@
 		<div class="easternaustralia"></div>
 	</div>	
 </map>
-<div class="info-panel" chat-directive></div>
 <div class="info-panel" info-panel-directive></div>

@@ -7,10 +7,11 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 		attackingQty = 0,
 		moveQty = 0,
 		mustering = false,
-		reoganization = false;
+		reoganization = false,
+		myBlockUI = blockUI.instances.get('myBlockUI');
 
 	// Block the user interface
-    blockUI.start('Wait for other players');
+    myBlockUI.start('Wait for other players');
 	Risk.initViewBind($scope);
 	$scope.turn = '1';
 	$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
@@ -23,7 +24,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	 */
 	Socket.on('turnStarted', function(turn) {
 		$scope.$apply(function() {
-			blockUI.stop();
+			myBlockUI.stop();
 			$scope.turnActive = true;
 			if (turn) $scope.turn = turn;
 		
@@ -83,7 +84,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	 */	
 	Socket.on('winner', function() {
 		$scope.$apply(function() {
-			blockUI.stop();
+			myBlockUI.stop();
 			ngDialog.open({ 
 				template: 'client/app/components/errorDialogs/winner.html',
 				scope: $scope,
@@ -100,7 +101,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	 */	
 	Socket.on('losser', function() {
 		$scope.$apply(function() {
-			blockUI.stop();
+			myBlockUI.stop();
 			ngDialog.open({ 
 				template: 'client/app/components/errorDialogs/losser.html',
 				scope: $scope,
@@ -296,7 +297,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 		Socket.emit('turnFinished', Handshake.getConfig().userId);
 		reoganization = false;
 		$scope.turnActive = false;
-		blockUI.start('Wait for other players');
+		myBlockUI.start('Wait for other players');
 	};
 
 	/**

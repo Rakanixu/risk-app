@@ -4,7 +4,8 @@
  */
 app.controller('RiskSetupController', function($scope, $location, Risk, blockUI, ngDialog) {
 	// Block the user interface
-    blockUI.start('Wait for other players');
+	var myBlockUI = blockUI.instances.get('myBlockUI');
+    myBlockUI.start('Wait for other players');
 
     // Ensures every set up is completly new. Service maintain the data if one connection with the server is lost and afterwards,
     // another user connects. The user who did not reconnect (waiting) had values from previous game
@@ -30,7 +31,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, blockUI,
 			$scope.turn = Risk.getMessage('armiesLeft', armiesLeft); 
 			$scope.waitMessage = Risk.getMessage('turnSetUp');
 			if (region) $scope.lastAction = Risk.getMessage('placedArmy', region);
-			blockUI.stop();
+			myBlockUI.stop();
 		});
 	});
 
@@ -54,7 +55,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, blockUI,
 	Socket.on('setupPhaseFinished', function(graph) {
 		Risk.setGraph(graph);
 		$scope.$apply(function() {
-			blockUI.stop();
+			myBlockUI.stop();
 			$location.path('/risk');
 		});
 	});
@@ -70,7 +71,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, blockUI,
 		if (Risk.setArmy(region, 1)) {
 			refreshView(region);
 			$scope.waitMessage = Risk.getMessage('waitSetUp');
-			blockUI.start('Wait for other players');
+			myBlockUI.start('Wait for other players');
 			Socket.emit('turnSetupFinished', Risk.getGraph(), region);			
 		} else {
 			ngDialog.open({ 

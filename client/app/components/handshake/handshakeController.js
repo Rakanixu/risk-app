@@ -2,7 +2,7 @@
 /**
  *  Handshake controller
  */
-app.controller('HandshakeController', function($scope, $location, $timeout, $window, Handshake, blockUI) {
+app.controller('HandshakeController', function($scope, $location, $timeout, $window, Handshake) {
 	$scope.room = Handshake.getRoom();
 	$scope.roomsList = Handshake.getRoomsList();
 
@@ -67,7 +67,6 @@ app.controller('HandshakeController', function($scope, $location, $timeout, $win
 	  */
 	Socket.on('partyBroken', function() {
 		$timeout(function() {
-			blockUI.stop();
 			//if redirects to root path, the client connection is maintained
 			//$location.path('/');
 			// Force a hard reset by closing current socket and connecting to server again
