@@ -68,13 +68,13 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 	
 		var initGame = function() {
 			this.clientSockets[turnToken].emit('turnStarted', risk.turn);
-			this.clientSockets[turnToken].on('applyMovementToParty', function(graph, regions, userId) {
+			this.clientSockets[turnToken].on('applyMovementToParty', function(dicesResult, graph, regions, userId) {
 				risk.graph = graph;
 
 				// Sends data to update on other clients with last attack
 				for (var i = 0; i < this.clientSockets.length; i++) {
-					if (i !== turnToken) {
-						this.clientSockets[i].emit('applyMovement', risk.graph, regions);
+					if (i !== turnToken % this.size) {
+						this.clientSockets[i].emit('applyMovement', dicesResult, risk.graph, regions);
 					}
 				}
 				
@@ -212,6 +212,4 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 		// Setup begins
 		initSetUp.call(this);
 	};
-
-	return this;
 };

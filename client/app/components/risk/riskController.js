@@ -18,6 +18,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	$scope.lastAction = '';
 	$scope.initGame = true;
 	$scope.turnActive = false;
+	$scope.showDicesResult = false;
 
 	/**
 	 * Server asign to client its turn
@@ -63,17 +64,39 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	/**
 	 * Server sent the data (last movement) from the active client
 	 */	
-	Socket.on('applyMovement', function(graph, regions) {
+	Socket.on('applyMovement', function(dicesResult, graph, regions) {
+		var region1 = regions.split(',')[0],
+			region2 = regions.split(',')[1];
+
 		Risk.setGraph(graph);
 
 		$scope.$apply(function() {
-			// Smoke gif is shown for 2500ms  
-			$scope.smokeAttack = regions.split(',')[0];
-			$scope.smokeDefense = regions.split(',')[1];
+			// Shows the dices result pop up to all players 
+			if (dicesResult) {
+				$scope.showDicesResult = true;
+				$scope.reg1 = region1;
+				$scope.reg2 = region2;
+				$scope.attackingDices = dicesResult.attackingDices;
+				$scope.defendingDices = dicesResult.defendingDices;
+				ngDialog.open({ 
+					template: 'client/app/components/errorDialogs/diceResult.html',
+					scope: $scope,
+					overlay: false,
+					closeByDocument: false,
+					closeByEscape: false,
+					showClose: false
+				});
+			}
+
+			// Result is shown for 4 sec. Smoke and dices result  
+			$scope.smokeAttack = region1;
+			$scope.smokeDefense = region2;
 			$timeout(function() {
+				ngDialog.close();
 				$scope.smokeAttack = null;
 				$scope.smokeDefense = null;
-			}, 2500);
+				$scope.showDicesResult = false;
+			}, 4000);
 			$scope.lastAction = Risk.getMessage('attack', regions);
 			$scope.mapTriggerWatcher = regions;
 		});
@@ -253,7 +276,10 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			$scope.mapTriggerWatcher = regions;
 			attackingQty = 0;
 			// Sends to server the result to update other clients
-			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions, Handshake.getConfig().userId);
+			Socket.emit('applyMovementToParty', {
+				attackingDices: attackingDices,
+				defendingDices: defendingDices
+			}, Risk.getGraph(graph), regions, Handshake.getConfig().userId);
 		}
 	};
 	
@@ -277,7 +303,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			$scope.mapTriggerWatcher = regions;
 			moveQty = 0;
 			// Sends to server the result to update other clients
-			Socket.emit('applyMovementToParty', Risk.getGraph(graph), regions, Handshake.getConfig().userId);
+			Socket.emit('applyMovementToParty', null, Risk.getGraph(graph), regions, Handshake.getConfig().userId);
 			$scope.finishTurn();
 		}			
 	};
