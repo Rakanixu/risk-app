@@ -2,7 +2,7 @@
 /**
  *  Game set up controller
  */
-app.controller('RiskSetupController', function($scope, $location, Risk, blockUI, ngDialog) {
+app.controller('RiskSetupController', function($scope, $location, Risk, Handshake, blockUI, ngDialog) {
 	// Block the user interface
 	var myBlockUI = blockUI.instances.get('myBlockUI');
     myBlockUI.start('Wait for other players');
@@ -16,6 +16,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, blockUI,
 	$scope.waitMessage = Risk.getMessage('waitSetUp');
 	$scope.lastAction = '';
 	$scope.initGame = false;
+	$scope.party = Handshake.getConfig().party;
 
     var refreshView = function(region) {
     	$scope.mapTriggerWatcher = region;

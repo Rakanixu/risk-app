@@ -19,6 +19,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	$scope.initGame = true;
 	$scope.turnActive = false;
 	$scope.showDicesResult = false;
+	$scope.party = Handshake.getConfig().party;
 
 	/**
 	 * Server asign to client its turn
@@ -289,7 +290,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	};
 	
 	/**
-	 * Manage an reorganization movement
+	 * Manage a reorganization movement
 	 */
 	$scope.resolveMovement = function() {
 		var i,

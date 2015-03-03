@@ -28,8 +28,10 @@ map div img.cannon  {
 }
 
 .info-panel {
-    float: left;
-    width: 148px;
+	float: none;
+	min-width: 148px;
+	overflow: hidden;
+	display: block;
 }
 
 .container {
@@ -40,6 +42,22 @@ map div img.cannon  {
 
 .wood {
 	background: url(../img/wood.jpg);
+}
+
+.player-icon {
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	margin-top: -10px;
+	margin-right: 7px;
+	border: 1px solid black;
+	border-radius: 5px;
+	opacity: 0.4;
+}
+
+.active {
+	opacity: 1;
+	box-shadow: 2px 2px 5px black;
 }
 
 .chat {

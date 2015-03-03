@@ -16,7 +16,7 @@ app.controller('ChatController', function($scope, Chat) {
 			});
 			angular.element('.chat').animate({
 				scrollTop: angular.element('.chat > div').height()
-			}, "slow");
+			}, 'slow');
 		});
 	});
 });

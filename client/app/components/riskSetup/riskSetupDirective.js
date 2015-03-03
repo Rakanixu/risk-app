@@ -41,10 +41,10 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 					'background: -moz-linear-gradient(' + colour + ',' + colour + ');' +
 					'background: linear-gradient(' + colour + ',' + colour + ');';
 
-			cannons = Math.floor(armySize / cannonVal); //Number of cannons
-			possibleKnights = armySize % cannonVal; //Number of posible remain knigts
-			knights = Math.floor(possibleKnights / knightVal); //Number of knigts
-			soldiers = possibleKnights % knightVal; //Number of soldiers
+			cannons = Math.floor(armySize / cannonVal); // Number of cannons
+			possibleKnights = armySize % cannonVal; // Number of posible remain knigts
+			knights = Math.floor(possibleKnights / knightVal); // Number of knigts
+			soldiers = possibleKnights % knightVal; // Number of soldiers
 
 			// $scope is not modified or binded - no need for $compile
 			$element.find(target + region).empty();

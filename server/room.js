@@ -51,9 +51,11 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 			for (var i = 0; i < this.size; i++) {
 				party.push({
 					colour: colours[i], 
-					id: this.players[i].userId
+					id: this.players[i].userId,
+					activeTurn: false
 				});
 			}
+			party[0].activeTurn = true;
 			
 		// Sends the colours and the players (Ids) to all clients.
 		// Client will manage how to asign colours to the oponents

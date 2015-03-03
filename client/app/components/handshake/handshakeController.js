@@ -37,9 +37,11 @@ app.controller('HandshakeController', function($scope, $location, $timeout, $win
 		// Removes the data of the own player. Stores adversaries data.
 		for (var i = 0; i < party.length; i++) {
 			if (party[i].id === Handshake.getConfig().userId) {
-				party.splice(i, 1);
+				// Assigns default colour for player
+				party[i].colour = Handshake.getConfig().colour;
 			}
 		}
+
 		Handshake.setConfig({
 			party: party
 		});
