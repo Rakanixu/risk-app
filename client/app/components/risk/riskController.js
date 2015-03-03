@@ -72,8 +72,10 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 
 		$scope.$apply(function() {
 			// Shows the dices result pop up to all players 
+			// If there is no dice info available, that means last movement was a reorganization
 			if (dicesResult) {
 				$scope.showDicesResult = true;
+				$scope.viewAction = Risk.getViewActions().attack;
 				$scope.reg1 = region1;
 				$scope.reg2 = region2;
 				$scope.attackingDices = dicesResult.attackingDices;
@@ -86,15 +88,18 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 					closeByEscape: false,
 					showClose: false
 				});
+			} else {
+				// Reorganization icon on the affected regions is shown 
+				$scope.viewAction = Risk.getViewActions().reorganization;
 			}
 
-			// Result is shown for 4 sec. Smoke and dices result  
-			$scope.smokeAttack = region1;
-			$scope.smokeDefense = region2;
+			$scope.updateRegionFrom = region1;
+			$scope.updateRegionTo = region2;
+			// Result is shown for 4 sec. 
 			$timeout(function() {
 				ngDialog.close();
-				$scope.smokeAttack = null;
-				$scope.smokeDefense = null;
+				$scope.updateRegionFrom = null;
+				$scope.updateRegionTo = null;
 				$scope.showDicesResult = false;
 			}, 4000);
 			$scope.lastAction = Risk.getMessage('attack', regions);

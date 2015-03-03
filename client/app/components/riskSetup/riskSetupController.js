@@ -36,7 +36,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, blockUI,
 	});
 
 	/**
-	 * Server sends data from other clientsto be updated on client
+	 * Server sends data from other clients to be updated on client
 	 * When event fired, UI should be blocked and should remain like that
 	 */
 	Socket.on('updateGraph', function(graph, region) {

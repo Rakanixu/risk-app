@@ -51,7 +51,7 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 			for (i = 0; i < cannons; i++) {
 				styleMargin = 'margin-left:' + margin + 'px';
 				$element.find(target + region).append('<img class="cannon" src="' + cannonPath + '" style="' + style + styleMargin + '"/>');
-				margin += 15;
+				margin += 30;
 			}
 			for (i = 0; i < knights; i++) {
 				styleMargin = 'margin-left:' + margin + 'px';
@@ -63,7 +63,13 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 				$element.find(target + region).append('<img src="' + soldierPath + '" style="' + style + styleMargin + '"/>');
 				margin += 15;
 			}
-			$element.find(target + region).append($compile('<img ng-show="smokeAttack == \'' + region + '\' || smokeDefense == \'' + region + '\'" class="smoke" src="client/assets/img/smoke.gif"/>')($scope));
+
+			// Append a icon for each action. attack / reorganization
+			if ($scope.viewAction === Risk.getViewActions().attack) {
+				$element.find(target + region).append($compile('<img ng-show="updateRegionFrom == \'' + region + '\' || updateRegionTo == \'' + region + '\'" class="action-icon" src="client/assets/img/smoke.gif"/>')($scope));
+			} else if ($scope.viewAction === Risk.getViewActions().reorganization) {
+				$element.find(target + region).append($compile('<img ng-show="updateRegionFrom == \'' + region + '\' || updateRegionTo == \'' + region + '\'" class="action-icon" src="client/assets/img/reorganization.png"/>')($scope));
+			}
 		}
 	};
 

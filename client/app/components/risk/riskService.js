@@ -8,6 +8,10 @@ app.service('Risk', function(Handshake) {
 			knightVal: 3,
 			cannonVal: 5
 		},
+		viewActions = {
+			attack: 'attack',
+			reorganization: 'reorganization'
+		},
 		messages = {
 			setUp: 'Set up phase. ',
 			waitSetUp: 'Please wait, adversaries placing army..',
@@ -85,6 +89,9 @@ app.service('Risk', function(Handshake) {
 			} else {
 				return messages[msg];
 			}
+		},
+		getViewActions: function() {
+			return viewActions;
 		},
 		checkMovement: function(from, to) {
 			// Checks ownership of the region and army size to decide if is an allowed movement 
