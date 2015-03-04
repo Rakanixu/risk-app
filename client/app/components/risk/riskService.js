@@ -22,14 +22,14 @@ app.service('Risk', function(Handshake) {
 				return 'Mustering phase. ' + arguments[0] + ' armies left.'
 			},
 			placedArmy: function() {
-				return 'Adversary placed an army on ' + arguments[0];
+				return 'Army placed on ' + arguments[0];
 			},
 			armiesLeft: function() {
 				return messages['setUp'] + arguments[0] + ' armies left.';
 			},
 			attack: function() {
 				var args = arguments[0].split(',');
-				return 'Adversary attacking from ' + args[0] + ' to ' + args[1];
+				return 'Attack from ' + args[0] + ' to ' + args[1];
 			}
 		},
 		graph = new MapGraph(),
