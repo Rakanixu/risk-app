@@ -7,7 +7,7 @@
 			</span>
 			Please wait... {{room.currentPlayers}}/{{room.numOfPlayers}} connected
 		</p>
-		<div ng-show="!roomsList.clientInRoom && room.players.length < room.size" ng-repeat="room in roomsList.list">
+		<div ng-show="!roomsList.clientInRoom && room.players.length < room.size" ng-repeat="room in roomsList.list track by $index">
 			<p>
 				<h3>Room {{$index + 1}}</h3>
 				<span>Players: </span><span ng-bind="room.players.length">0</span>/<span ng-bind="room.size"></span>
@@ -23,5 +23,13 @@
 			<option value="">Select number of players</option>
 		</select>
 	</div>
+
+	<div ng-show="!room.createdByUser && !roomsList.clientInRoom">
+		<h2>Solo game</h2>
+		<label>Select number of AI players</label>
+		<select ng-model="room.selectedNumPlayers" ng-change="room.createSoloRoom()" ng-options="numPlayers for numPlayers in room.roomSelector">
+			<option value="">Select number of AI players</option>
+		</select>
+	</div>	
 </div>
 

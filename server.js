@@ -9,19 +9,6 @@ var port = process.env.PORT || 80,
     Room = require('./server/room.js'),
     rooms = [];
 
-    Array.prototype.getRoomsData = function() {
-    	var roomsInfo = [];
-
-		for (var i = 0; i < this.length; i++) {
-			roomsInfo[i] = {
-				size: this[i].size,
-				players: this[i].players,
-				roomName: this[i].roomName
-			};
-		}
-		return roomsInfo;
-    };
-
 /**
   * Server listens on port
   */
@@ -62,4 +49,20 @@ io.on('connection', function(socket) {
 		});
 	}, 1000);
 });
+
+/**
+  * Utils
+  */
+Array.prototype.getRoomsData = function() {
+	var roomsInfo = [];
+
+	for (var i = 0; i < this.length; i++) {
+		roomsInfo[i] = {
+			size: this[i].size,
+			players: this[i].players,
+			roomName: this[i].roomName
+		};
+	}
+	return roomsInfo;
+};
 

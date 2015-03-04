@@ -63,7 +63,7 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 
 	this.assignColours = function() {
 		var roomClients = io.sockets.adapter.rooms[this.roomName],
-			colours = ['red', 'green', 'blue', 'purple', 'cyan', 'white', 'pink', 'orange'],
+			colours = ['red', 'green', 'blue', 'purple', 'cyan', 'black', 'white', 'pink', 'orange'],
 			party = [];
 
 			for (var i = 0; i < this.size; i++) {
@@ -105,6 +105,8 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 							party.splice(i, 1);
 							this.size--;
 
+							io.to(this.roomName).emit('updateParty', party);
+
 							for (var i = 0; i < this.players.length; i++) {
 								if (this.players[i].userId === userId) {
 									// turnToken is equals to the position of the user with the turn
@@ -120,7 +122,9 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 
 				// Sends data to update on other clients with last attack
 				for (var i = 0; i < this.clientSockets.length; i++) {
-					this.clientSockets[i].emit('applyMovement', dicesResult, risk.graph, regions, party);
+					if (i !== turnToken % this.size) {
+						this.clientSockets[i].emit('applyMovement', dicesResult, risk.graph, regions, party);
+					}
 				}
 			}.bind(this));
 
@@ -137,7 +141,6 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 
 			// Client finished his turn
 			this.clientSockets[turnToken].on('turnFinished', function(party, userId) {
-
 				io.to(this.roomName).emit('updateParty', updatePartyTurn(party));
 				// After finish its turn, check if player won the match
 				if (risk.checkWinningCondition(userId)) {

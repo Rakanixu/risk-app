@@ -1,7 +1,7 @@
 <div class="container wood">	
 	<p><span class="strong">Turn: </span><span ng-bind="turn"></span></p>
 	<div>
-		<span class="player-icon" ng-repeat="player in party" ng-style="{'background-color': player.colour}" ng-class="{'active': player.activeTurn}"></span>
+		<span class="player-icon" ng-repeat="player in party track by $index" ng-style="{'background-color': player.colour}" ng-class="{'active': player.activeTurn}"></span>
 	</div>
 	<p ng-bind="waitMessage"></p>
 	<p ng-if="lastAction"><span class="strong" >Adversary last action: </span><span ng-bind="lastAction"></span></p>

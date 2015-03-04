@@ -17,6 +17,11 @@ app.service('Handshake', function() {
 				this.createdByUser = true;
 				this.numOfPlayers = this.selectedNumPlayers;
 				Socket.emit('createRoom', this.numOfPlayers);
+			},
+			createSoloRoom: function() {
+				this.createdByUser = true;
+				this.numOfPlayers = this.selectedNumPlayers;
+				Socket.emit('createSoloRoom', this.numOfPlayers);				
 			}
 		},
 		roomsList = {
