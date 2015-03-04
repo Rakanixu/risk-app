@@ -25,14 +25,10 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 				armySize = Risk.getGraph()[region].armySize ? Risk.getGraph()[region].armySize : 0,
 				i;
 
-			if (Risk.getGraph()[region].owner === Handshake.getConfig().userId) {
-				colour = Handshake.getConfig().colour;
-			} else {
-				for (var j = 0; j < party.length; j++) {
-					if (Risk.getGraph()[region].owner === party[j].id) {
-						colour = party[j].colour
-						break;
-					}
+			for (var j = 0; j < party.length; j++) {
+				if (Risk.getGraph()[region].owner === party[j].id) {
+					colour = party[j].colour
+					break;
 				}
 			}
 

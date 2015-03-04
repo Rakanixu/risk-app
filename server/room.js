@@ -35,6 +35,24 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 		}
 	};
 
+	var updatePartyTurn = function(party) {
+		// Last client had the turn, pass to the first one
+		if (party[party.length - 1].activeTurn) {
+			party[0].activeTurn = true;
+			party[party.length - 1].activeTurn = false;
+		} else {
+			for (var i = 0; i < party.length; i++) {
+				if (party[i].activeTurn) {
+					party[i + 1].activeTurn = true;
+					party[i].activeTurn = false;
+					break;
+				}
+			}
+		}
+
+		return party;
+	};
+
 	this.checkFullRoom = function() {
 		if (this.players.length === this.size) {
 			return true;
@@ -45,7 +63,7 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 
 	this.assignColours = function() {
 		var roomClients = io.sockets.adapter.rooms[this.roomName],
-			colours = ['green', 'cyan', 'orange', 'blue', 'white', 'pink', 'purple'],
+			colours = ['red', 'green', 'blue', 'purple', 'cyan', 'white', 'pink', 'orange'],
 			party = [];
 
 			for (var i = 0; i < this.size; i++) {
@@ -68,17 +86,10 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 			turnToken = 0,
 			initializeFirstTurn = false;
 	
-		var initGame = function() {
+		var initGame = function(party) {
 			this.clientSockets[turnToken].emit('turnStarted', risk.turn);
-			this.clientSockets[turnToken].on('applyMovementToParty', function(dicesResult, graph, regions, userId) {
+			this.clientSockets[turnToken].on('applyMovementToParty', function(dicesResult, graph, regions, party, userId) {
 				risk.graph = graph;
-
-				// Sends data to update on other clients with last attack
-				for (var i = 0; i < this.clientSockets.length; i++) {
-					if (i !== turnToken % this.size) {
-						this.clientSockets[i].emit('applyMovement', dicesResult, risk.graph, regions);
-					}
-				}
 				
 				// Attacker conquest the region
 				// Checks if attacked player lost all his regions
@@ -91,6 +102,7 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 							this.clientSockets[i].removeAllListeners();
 							this.clientSockets.splice(i, 1);
 							this.players.splice(i, 1);
+							party.splice(i, 1);
 							this.size--;
 
 							for (var i = 0; i < this.players.length; i++) {
@@ -104,6 +116,11 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 							break;
 						}
 					}
+				}
+
+				// Sends data to update on other clients with last attack
+				for (var i = 0; i < this.clientSockets.length; i++) {
+					this.clientSockets[i].emit('applyMovement', dicesResult, risk.graph, regions, party);
 				}
 			}.bind(this));
 
@@ -119,7 +136,9 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 			}.bind(this));
 
 			// Client finished his turn
-			this.clientSockets[turnToken].on('turnFinished', function(userId) {
+			this.clientSockets[turnToken].on('turnFinished', function(party, userId) {
+
+				io.to(this.roomName).emit('updateParty', updatePartyTurn(party));
 				// After finish its turn, check if player won the match
 				if (risk.checkWinningCondition(userId)) {
 					this.clientSockets[turnToken % this.size].emit('winner');
@@ -158,14 +177,14 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 			this.clientSockets[turnToken].emit('turnSetupStarted', risk.graph, risk.lastRegion, risk.setUpArmySize);	
 			if (!listenerActive[turnToken]) {
 				// Listens player who owns the turn on turnFinished once
-				this.clientSockets[turnToken].on('turnSetupFinished', function(graph, region) {
+				this.clientSockets[turnToken].on('turnSetupFinished', function(graph, region, party) {
 					risk.graph = graph;
 					risk.lastRegion = region;
+					party = updatePartyTurn(party);
+
 					// Sends updated data to all players in the room except the one who perform the action
 					for (var i = 0; i < this.clientSockets.length; i++) {
-						if (i !== turnToken) {
-							this.clientSockets[i].emit('updateGraph', risk.graph, risk.lastRegion);
-						}
+						this.clientSockets[i].emit('updateGraph', risk.graph, risk.lastRegion, party);
 					}
 					turnToken++;
 

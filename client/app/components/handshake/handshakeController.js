@@ -34,14 +34,6 @@ app.controller('HandshakeController', function($scope, $location, $timeout, $win
 	  * playerColour event. Server assigns different colours for every player.
 	  */
 	Socket.on('partyColours', function(party) {
-		// Removes the data of the own player. Stores adversaries data.
-		for (var i = 0; i < party.length; i++) {
-			if (party[i].id === Handshake.getConfig().userId) {
-				// Assigns default colour for player
-				party[i].colour = Handshake.getConfig().colour;
-			}
-		}
-
 		Handshake.setConfig({
 			party: party
 		});

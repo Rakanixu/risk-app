@@ -21,6 +21,5 @@ app.service('Chat', function(Handshake) {
 		for (var i = 0; i < party.length; i++) {
 			if (userId === party[i].id) return party[i].colour;
 		}
-		return Handshake.getConfig().colour;
 	};
 });

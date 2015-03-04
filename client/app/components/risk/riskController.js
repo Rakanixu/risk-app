@@ -65,13 +65,17 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	/**
 	 * Server sent the data (last movement) from the active client
 	 */	
-	Socket.on('applyMovement', function(dicesResult, graph, regions) {
+	Socket.on('applyMovement', function(dicesResult, graph, regions, party) {
 		var region1 = regions.split(',')[0],
 			region2 = regions.split(',')[1];
 
 		Risk.setGraph(graph);
+		Handshake.setConfig({
+			party: party
+		});
 
 		$scope.$apply(function() {
+			$scope.party = Handshake.getConfig().party;
 			// Shows the dices result pop up to all players 
 			// If there is no dice info available, that means last movement was a reorganization
 			if (dicesResult) {
@@ -105,6 +109,19 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			}, 4000);
 			$scope.lastAction = Risk.getMessage('attack', regions);
 			$scope.mapTriggerWatcher = regions;
+		});
+	});
+
+	/**
+	 * Update party event to notice the custom turn
+	 */	
+	Socket.on('updateParty', function(party) {
+		Handshake.setConfig({
+			party: party
+		});
+
+		$scope.$apply(function() {
+			$scope.party = Handshake.getConfig().party;
 		});
 	});
 
@@ -285,7 +302,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			Socket.emit('applyMovementToParty', {
 				attackingDices: attackingDices,
 				defendingDices: defendingDices
-			}, Risk.getGraph(graph), regions, Handshake.getConfig().userId);
+			}, Risk.getGraph(graph), regions, Handshake.getConfig().party, Handshake.getConfig().userId);
 		}
 	};
 	
@@ -326,7 +343,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	 */
 	$scope.finishTurn = function() {
 		$scope.waitMessage = Risk.getMessage('waitPlayerTurn');
-		Socket.emit('turnFinished', Handshake.getConfig().userId);
+		Socket.emit('turnFinished', Handshake.getConfig().party, Handshake.getConfig().userId);
 		reoganization = false;
 		$scope.turnActive = false;
 		myBlockUI.start('Wait for other players');

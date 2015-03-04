@@ -5,7 +5,6 @@
 app.service('Handshake', function() {
 	var handshakeConfig = {
 			userId: null,
-			colour: 'red',
 			party: null
 		},
 		room = {
@@ -44,7 +43,6 @@ app.service('Handshake', function() {
 		},
 		setConfig: function(config) {
 			if (config.userId !== undefined) handshakeConfig.userId = config.userId;
-			if (config.colour !== undefined) handshakeConfig.colour = config.colour;
 			if (config.party !== undefined) handshakeConfig.party = config.party;
 		}
 	}

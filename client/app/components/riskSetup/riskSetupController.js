@@ -40,9 +40,15 @@ app.controller('RiskSetupController', function($scope, $location, Risk, Handshak
 	 * Server sends data from other clients to be updated on client
 	 * When event fired, UI should be blocked and should remain like that
 	 */
-	Socket.on('updateGraph', function(graph, region) {
+	Socket.on('updateGraph', function(graph, region, party) {
 		Risk.setGraph(graph);
+
 		$scope.$apply(function() {
+			Handshake.setConfig({
+				party: party
+			});
+			$scope.party = Handshake.getConfig().party;
+
 			refreshView(region);
 			$scope.waitMessage = Risk.getMessage('turnSetUp');
 			if (region) $scope.lastAction = Risk.getMessage('placedArmy', region);
@@ -73,7 +79,7 @@ app.controller('RiskSetupController', function($scope, $location, Risk, Handshak
 			refreshView(region);
 			$scope.waitMessage = Risk.getMessage('waitSetUp');
 			myBlockUI.start('Wait for other players');
-			Socket.emit('turnSetupFinished', Risk.getGraph(), region);			
+			Socket.emit('turnSetupFinished', Risk.getGraph(), region, Handshake.getConfig().party);			
 		} else {
 			ngDialog.open({ 
 				template: 'client/app/components/errorDialogs/freeRegionAvailable.html'
