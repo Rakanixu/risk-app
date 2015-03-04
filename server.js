@@ -7,6 +7,7 @@ var port = process.env.PORT || 80,
     UUID = require('node-uuid'),
     Handshake = require('./server/handshake.js')(io, UUID),
     Room = require('./server/room.js'),
+    SoloRoom = require('./server/soloRoom.js'),
     rooms = [];
 
 /**
@@ -46,6 +47,12 @@ io.on('connection', function(socket) {
 
 		socket.on('joinRoom', function(roomName) {
 			Handshake.joinRoom(this, rooms, roomName);
+		});
+
+		socket.on('createSoloRoom', function(numPlayers) {
+			var soloRoom = new SoloRoom(socket, numPlayers);
+
+			soloRoom.initRoom();
 		});
 	}, 1000);
 });

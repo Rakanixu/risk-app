@@ -4,8 +4,7 @@
  */
 module.exports = function(io, roomName, numPlayers, rooms) {
 	var Risk = require('./risk.js'),
-		risk = new Risk(numPlayers),
-		turn = 1;
+		risk = new Risk(numPlayers);
 
 	this.roomName = roomName;
 	this.size = (typeof numPlayers === 'number') ? numPlayers : 3;
