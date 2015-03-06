@@ -1,4 +1,6 @@
 'use strict';
+
+var Q = require('q');
 /**
   * AI Player
   * Provides the logic for manage AI players
@@ -49,14 +51,14 @@ module.exports = function() {
 					var toRegion = risk.graph[region].link[linkedRegion];
 
 					// AI Players just attack the client
-					if (risk.graph[toRegion].owner === humanPlayerId) {
-						worthlyAttack.isWorthly = true;
-						worthlyAttack.fromRegion = region;
-						worthlyAttack.toRegion = toRegion;
+					if (risk.graph[toRegion]) {
+						if (risk.graph[toRegion].owner === humanPlayerId) {
+							worthlyAttack.isWorthly = true;
+							worthlyAttack.fromRegion = region;
+							worthlyAttack.toRegion = toRegion;
 
-						console.log('worthlyAttack', worthlyAttack);
-
-						return worthlyAttack;
+							return worthlyAttack;
+						}
 					}
 				}
 			}
@@ -84,9 +86,10 @@ module.exports = function() {
 		return losses;
 	};
 
-	var excuteAttack = function(userId, risk, fromRegion, toRegion) {
+	var excuteAttack = function(socket, userId, risk, fromRegion, toRegion, party) {
 		var from = risk.graph[fromRegion],
 			to = risk.graph[toRegion],
+			regions = toRegion + ',' + fromRegion,
 			attackingQty = risk.graph[fromRegion].armySize - 1,
 			attackingQtyDices = (from.armySize > 3) ? 3 : from.armySize - 1,
 			defendingQtyDices = (to.armySize > 2) ? 2 : to.armySize,
@@ -95,10 +98,10 @@ module.exports = function() {
 			combatResult = null;
 
 		for (var i = 0; i < attackingQtyDices; i++) {
-			attackingDices.push(Math.floor((Math.random() * 6) + 1));
+			attackingDices.push('dice' + Math.floor((Math.random() * 6) + 1));
 		}
 		for (var i = 0; i < defendingQtyDices; i++) {
-			defendingDices.push(Math.floor((Math.random() * 6) + 1));
+			defendingDices.push('dice' + Math.floor((Math.random() * 6) + 1));
 		}
 		attackingDices.sort();
 		attackingDices.reverse();
@@ -117,12 +120,12 @@ module.exports = function() {
 				risk.graph[toRegion].armySize = attackingQty - combatResult.attacker;
 				risk.graph[fromRegion].armySize -= attackingQty
 			}
-
 		}
 
-		console.log(attackingDices, defendingDices);
-		console.log('from region ', risk.graph[fromRegion]);
-		console.log('to region   ', risk.graph[toRegion]);
+		socket.emit('applyMovement', {
+				attackingDices: attackingDices,
+				defendingDices: defendingDices
+		}, risk.graph, regions, party);
 	};
 
 	return {
@@ -159,16 +162,54 @@ module.exports = function() {
 			}
 
 		},
-		executeAttackPool: function(userId, risk) {
-			var worthlyAttack = checkWorthlyAttack(userId, risk);
+		executeAttackPool: function(socket, userId, risk, party) {
+			var worthlyAttack = null,
+				timeout = 1,
+				attackPoolDefer = Q.defer();
 
-			// Attack until is no worthly attack
-			while (worthlyAttack.isWorthly) {
-				// Executes an individual attack
-				excuteAttack(userId, risk, worthlyAttack.fromRegion, worthlyAttack.toRegion);
-				// Checks for more worthly attacks
-				worthlyAttack = checkWorthlyAttack(userId, risk);
+			// Helper for manage async single attacks
+			var attackHelper = function(worthlyAttack) {
+				var defer = Q.defer();
+
+				// Set a time out to execute the attack
+				Q.delay(timeout).done(function() {
+					// Executes a single attack
+					excuteAttack(socket, userId, risk, worthlyAttack.fromRegion, worthlyAttack.toRegion, party);	
+
+					// Checks if one more worthly attack can be done
+					worthlyAttack = checkWorthlyAttack(userId, risk);
+					if (worthlyAttack.isWorthly) {
+						timeout = 4000;
+
+						// Resolve recursive promises - one per attack
+						attackHelper(worthlyAttack).then(function() {
+							defer.resolve();
+						});
+					} else {
+						// Resolve the promise when no more attacks can be done
+						defer.resolve();
+					}
+				});
+
+				return defer.promise;
+			};
+
+			// Checks if attack is worthly
+			worthlyAttack = checkWorthlyAttack(userId, risk);
+
+			// Resolves the promise after all attacks has been made
+			if (worthlyAttack.isWorthly) {
+				attackHelper(worthlyAttack).then(function() {
+					attackPoolDefer.resolve();
+					return attackPoolDefer.promise;
+				});
+			// Resolves the promise if there is no available attack
+			} else {
+				attackPoolDefer.resolve();
+				return attackPoolDefer.promise;
 			}
+
+			return attackPoolDefer.promise;
 		}
 	}
 };

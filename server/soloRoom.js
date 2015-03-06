@@ -1,6 +1,7 @@
 'use strict';
 
-var UUID = require('node-uuid'),
+var Q = require('q'),
+	UUID = require('node-uuid'),
 	Risk = require('./risk.js'),
 	AIPlayer = require('./aiPlayer')();
 /**
@@ -111,19 +112,23 @@ module.exports = function(socket, numPlayers) {
 
 		// Client finished his turn
 		socket.on('turnFinished', function(party, userId) {
-			var timeout = 1000;
+			/*var timeout = 1000;
 
 			// Clousere for async loop
 			var aiGame = function(i) {
 				var index = i;
 
 				return function() {
+					var defer = Q.defer();
+
 					updatePartyTurn(party);
 					socket.emit('updateParty', party);
+
 					// After each attack
-					//applyMovementToParty event callback should be executed
-					AIPlayer.executeAttackPool(this.players[index].id, risk);
-					socket.emit('updateGraph', risk.graph, risk.lastRegion, party);
+					AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party).then(function() {
+						console.log('CALLBACK - PLAYER FINISHED ', this.players[index].id);
+						defer.resolve();
+					});
 
 					// After all AI players had their turn
 					if (index === this.size - 1) {
@@ -135,6 +140,8 @@ module.exports = function(socket, numPlayers) {
 							socket.emit('turnStarted', risk.turn);
 						}, 1500);
 					}
+
+					return defer.promise;
 				}.bind(this);
 			};
 
@@ -150,7 +157,32 @@ module.exports = function(socket, numPlayers) {
 				// Inner method will be trigger by the setTimeout
 				setTimeout(aiGame.bind(this)(i), timeout);
 				timeout += 1000;
-			}
+			}*/
+			var index = 1;
+				AIPlayer.executeAttackPool(socket, this.players[1].id, risk, party).then(function() {
+					console.log('CALLBACK');
+
+				});
+
+
+/*			var attackPoolHelper = function() {
+				console.log('attackPoolHelper called', index);
+				AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party).then(function() {
+console.log('CALLBACK', index, this.size);
+
+					index++;
+console.log(index, this.size);
+					if (index < this.size) {
+						attackPoolHelper();
+					} else {
+						console.log('all players finished');
+					}
+				});
+			}.bind(this);
+
+			attackPoolHelper();*/
+								
+
 		}.bind(this));
 	};
 
