@@ -7,15 +7,41 @@ var Q = require('q');
   */
 module.exports = function() {
 	var humanPlayerId = null,
+		musteringRatio = 3,
 		continents = {
-			northamerica: 'northamerica',
-			southamerica: 'southamerica',
-			europe: 'europe',
-			africa: 'africa',
-			asia: 'asia',
-			oceania: 'oceania'
+			northamerica: {
+				name: 'northamerica',
+				regions: 9,
+				armies:5
+			},
+			southamerica: {
+				name: 'southamerica',
+				regions: 4,
+				armies: 2
+			},
+			africa: {
+				name: 'africa',
+				regions: 6,
+				armies: 3
+			},
+			europe: {
+				name: 'europe',
+				regions: 7,
+				armies: 5
+			},
+			asia: {
+				name: 'asia',
+				regions: 12,
+				armies: 7
+			},
+			oceania: {
+				name: 'oceania',
+				regions: 4,
+				armies: 2
+			}
 		};
 
+	// Place an army on the graph
 	var placeArmy = function(userId, risk, region) {
 		risk.graph[region].owner = userId;
 		risk.lastRegion = region;
@@ -25,9 +51,10 @@ module.exports = function() {
 			risk.graph[region].armySize = 1;
 		}
 
-		return true;
+		return region;
 	};
 
+	// Checks for empty regions on the graph
 	var checkEmptyRegion = function(risk) {
 		for (var region in risk.graph) {
 			if (!risk.graph[region].owner) return true;
@@ -35,7 +62,40 @@ module.exports = function() {
 
 		return false;
 	};
+	
+	// Execute the set up phase 
+	var setUp = function(risk, userId) {
+		// NOT DOING ANY TYPE OF PRIORITY PLACEMENT - REFACTOR
+		if (checkEmptyRegion(risk)) {
+			for (var region in risk.graph) {
+				// Check for a free region
+				if (risk.graph[region].owner === undefined) {
+					// Gives priority to regions which belongs to small continents
+					if (risk.graph[region].continent === continents.southamerica.name) {
+						return placeArmy(userId, risk, region);
+					} else if (risk.graph[region].continent === continents.oceania.name) {
+						return placeArmy(userId, risk, region);
+					} else if (risk.graph[region].continent === continents.africa.name) {
+						return placeArmy(userId, risk, region);
+					} else if (risk.graph[region].continent === continents.northamerica.name) {
+						return placeArmy(userId, risk, region);
+					} else if (risk.graph[region].continent === continents.europe.name) {
+						return placeArmy(userId, risk, region);
+					} else if (risk.graph[region].continent === continents.asia.name) {
+						return placeArmy(userId, risk, region);
+					}
+				}
+			}
+		} else {
+			for (var region in risk.graph) {
+				if (risk.graph[region].owner === userId) {
+					return placeArmy(userId, risk, region);
+				}
+			}
+		}
+	};
 
+	// Checks for worthy attacks and returns the targets
 	var checkWorthlyAttack = function(userId, risk) {
 		var worthlyAttack = {
 			isWorthly: false,
@@ -66,7 +126,88 @@ module.exports = function() {
 
 		return worthlyAttack;
 	};
+	
+	// Minimum mustering is always 3, or number of region divided by 3 rounded to smallest
+	var musteringPerRegions = function(risk, userId) {
+		var regions = 0,
+			armies = 0;
+			
+		for (var region in risk.graph) {
+			if (risk.graph[region].owner === userId) {
+				regions++;
+			}
+		}
+		armies = Math.floor(regions/musteringRatio);
+		if (armies > 3) {
+			return armies;
+		} else {
+			return musteringRatio;
+		}
+	};
+	
+	// Mustering per continents if player controls the whole continent at the beginning of his turn
+	var musteringPerContinents = function(risk, userId) {
+		var armies = 0,
+			northAmerica = 0,
+			southAmerica = 0,
+			africa = 0,
+			europe = 0,
+			asia = 0,
+			oceania = 0;
+			
+		for (var region in risk.graph) {
+			if (risk.graph[region].owner === userId) {
+				switch (risk.graph[region].continent) {
+					case continents.northamerica.name:
+						northAmerica++;
+						break;
+					case continents.southamerica.name:
+						southAmerica++;
+						break;
+					case continents.africa.name:
+						africa++;
+						break;
+					case continents.europe.name:
+						europe++;
+						break;
+					case continents.asia.name:
+						asia++;
+						break;
+					case continents.oceania.name:
+						oceania++;
+						break;						
+				}
+			}
+		}
 
+		if (northAmerica === continents.northamerica.regions) {
+			armies += continents.northamerica.armies;
+		}
+		if (southAmerica === continents.southamerica.regions) {
+			armies += continents.southamerica.armies;
+		}
+		if (africa === continents.africa.regions) {
+			armies += continents.africa.armies;
+		}
+		if (europe === continents.europe.regions) {
+			armies += continents.europe.armies;
+		}
+		if (asia === continents.asia.regions) {
+			armies += continents.asia.armies;
+		}
+		if (oceania === continents.oceania.regions) {
+			armies += continents.oceania.armies;
+		}
+		
+		return armies;
+	};	
+	
+	// Returns the number of units to muster
+	var calculateMustering = function(risk, userId) {
+		return musteringPerRegions(risk, userId) + musteringPerContinents(risk, userId);
+	};
+
+	// Resolves an attack
 	var getAttackResult = function(attackingDices, defendingDices) {
 		var i = 0,
 			length = (attackingDices.length >= defendingDices.length) ? defendingDices.length : attackingDices.length,
@@ -86,6 +227,7 @@ module.exports = function() {
 		return losses;
 	};
 
+	// Executes an attack
 	var excuteAttack = function(socket, userId, risk, fromRegion, toRegion, party) {
 		var from = risk.graph[fromRegion],
 			to = risk.graph[toRegion],
@@ -132,35 +274,40 @@ module.exports = function() {
 		setHumanPlayerId: function(id) {
 			humanPlayerId = id;
 		},
-		executeSetUp: function(userId, risk) {
-			if (checkEmptyRegion(risk)) {
-				for (var region in risk.graph) {
-					// Check for a free region
-					if (risk.graph[region].owner === undefined) {
-						// Gives priority to regions which belongs to small continents
-						if (risk.graph[region].continent === continents.southamerica) {
-							return placeArmy(userId, risk, region);
-						} else if (risk.graph[region].continent === continents.oceania) {
-							return placeArmy(userId, risk, region);
-						} else if (risk.graph[region].continent === continents.africa) {
-							return placeArmy(userId, risk, region);
-						} else if (risk.graph[region].continent === continents.northamerica) {
-							return placeArmy(userId, risk, region);
-						} else if (risk.graph[region].continent === continents.europe) {
-							return placeArmy(userId, risk, region);
-						} else if (risk.graph[region].continent === continents.asia) {
-							return placeArmy(userId, risk, region);
-						}
+		executeSetUp: function(risk, userId) {
+			setUp(risk, userId);
+		},
+		executeMustering: function(socket, risk, userId) {
+			var deferMustering = Q.defer(),
+				musteringSize = calculateMustering(risk, userId),
+				timeout = 1000,
+				region = null;
+				
+			var singleMustering = function() {
+				region = setUp(risk, userId);
+				socket.emit('applyMustering', risk.graph, region);
+				musteringSize--;
+				
+				// Set an army per second
+				Q.delay(timeout).done(function() {
+					// AI player had placed all its available armies
+					if (musteringSize === 0) {
+						deferMustering.resolve();
+					// AI player has more armies to place
+					} else {
+						singleMustering();
 					}
-				}
+				});
+			};				
+			
+			// First turn, no mustering is allowed
+			if (risk.turn <= 1) {
+				deferMustering.resolve();
 			} else {
-				for (var region in risk.graph) {
-					if (risk.graph[region].owner === userId) {
-						return placeArmy(userId, risk, region);
-					}
-				}
+				singleMustering();
 			}
-
+		
+			return deferMustering.promise;
 		},
 		executeAttackPool: function(socket, userId, risk, party) {
 			var worthlyAttack = null,
@@ -179,7 +326,7 @@ module.exports = function() {
 					// Checks if one more worthly attack can be done
 					worthlyAttack = checkWorthlyAttack(userId, risk);
 					if (worthlyAttack.isWorthly) {
-						timeout = 4000;
+						timeout = 4100;
 
 						// Resolve recursive promises - one per attack
 						attackHelper(worthlyAttack).then(function() {
@@ -201,12 +348,10 @@ module.exports = function() {
 			if (worthlyAttack.isWorthly) {
 				attackHelper(worthlyAttack).then(function() {
 					attackPoolDefer.resolve();
-					return attackPoolDefer.promise;
 				});
 			// Resolves the promise if there is no available attack
 			} else {
 				attackPoolDefer.resolve();
-				return attackPoolDefer.promise;
 			}
 
 			return attackPoolDefer.promise;

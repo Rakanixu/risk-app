@@ -86,6 +86,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 				$scope.reg2 = region2;
 				$scope.attackingDices = dicesResult.attackingDices;
 				$scope.defendingDices = dicesResult.defendingDices;
+
 				dialogInstance = ngDialog.open({ 
 					template: 'client/app/components/errorDialogs/diceResult.html',
 					scope: $scope,

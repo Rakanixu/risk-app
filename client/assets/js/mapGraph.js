@@ -6,7 +6,7 @@
 var MapGraph = function() {
 	return {
 		//debug data for AI players - START
-		'alaska': {
+		/*'alaska': {
 			link: ['northwest', 'alberta'],
 			continent: 'northamerica'
 		},
@@ -17,9 +17,9 @@ var MapGraph = function() {
 		'alberta': {
 			link: ['alaska', 'northwest'],
 			continent: 'northamerica'
-		}
+		}*/
 		//debug data for AI players - END
-		/*'alaska': {
+		'alaska': {
 			link: ['kamchatka', 'northwest', 'alberta'],
 			continent: 'northamerica'
 		},
@@ -186,6 +186,6 @@ var MapGraph = function() {
 		'easternaustralia': {
 			link: ['westernaustralia', 'newguinea'],
 			continent: 'oceania'
-		}*/
+		}
 	}
 };

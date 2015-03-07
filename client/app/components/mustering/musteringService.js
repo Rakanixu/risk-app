@@ -37,7 +37,7 @@ app.service('Mustering', function(Handshake, Risk) {
 			}
 		};
 	
-	// Minimun mustering is always 3, or numer of region divided by 3 rounded to smallest
+	// Minimum mustering is always 3, or number of region divided by 3 rounded to smallest
 	var musteringPerRegions = function() {
 		var graph = Risk.getGraph(),
 			regions = 0,

@@ -52,7 +52,7 @@ module.exports = function(socket, numPlayers) {
 				var index = i;
 
 				return function() {
-					AIPlayer.executeSetUp(this.players[index].id, risk);
+					AIPlayer.executeSetUp(risk, this.players[index].id);
 					updatePartyTurn(party);
 					socket.emit('updateGraph', risk.graph, risk.lastRegion, party);
 
@@ -113,11 +113,17 @@ module.exports = function(socket, numPlayers) {
 		// Client finished his turn
 		socket.on('turnFinished', function(party, userId) {
 			var index = 1,
-				timeout = 4000;
+				timeout = 4100;
 			
 			// Perform all AI player's attacks
-			var attackPoolHelper = function() {
-				AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party).then(function() {
+			var aiPlayerHelper = function() {
+				// Executes mustering phase
+				// Once the muster phase had finished, attacking phase begin
+				AIPlayer.executeMustering(socket, risk, this.players[index].id).then(function() {
+					// Returns a promise allowing chaining all async operations
+					return AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party);
+				// Once attacking phase had finished, check lossing conditions and call next AI player's actions
+				}.bind(this)).then(function() {
 					Q.delay(timeout).done(function() {
 						index++;
 						
@@ -131,19 +137,19 @@ module.exports = function(socket, numPlayers) {
 						}
 
 						if (index < this.size) {
-							// Call the helper until all AI players had their turn
-							attackPoolHelper();
+							// Recursive calls until all AI players had their turn
+							aiPlayerHelper();
 						} else {
 							Q.delay(1000).done(function() {
 								risk.turn++;
 								socket.emit('turnStarted', risk.turn);
 							});
 						}
-					}.bind(this));
+					}.bind(this));				
 				}.bind(this));
 			}.bind(this);
 			
-			// Check for winning condition
+			// Check for winning condition at the end of player´s turn
 			if (risk.checkWinningCondition(userId)) {
 				socket.emit('winner');
 				return;
@@ -153,7 +159,7 @@ module.exports = function(socket, numPlayers) {
 			socket.emit('updateParty', party);
 			
 			// Executes the attack helper
-			attackPoolHelper();
+			aiPlayerHelper();
 								
 		}.bind(this));
 	};
