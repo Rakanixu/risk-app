@@ -105,7 +105,7 @@ module.exports = function() {
 
 		for (var region in risk.graph) {
 			// Find a region where the AI player is the owner with a size army greater than 3 (3 attack dices available)
-			if (risk.graph[region].owner === userId && risk.graph[region].armySize > 1) {//!!!!DEGUG = 1, NO DEBUG = 3!!!!
+			if (risk.graph[region].owner === userId && risk.graph[region].armySize > 3) {
 				// Find a linked region where the adversay is the client
 				for (var linkedRegion in risk.graph[region].link) {
 					var toRegion = risk.graph[region].link[linkedRegion];
