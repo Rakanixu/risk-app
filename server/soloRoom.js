@@ -112,77 +112,49 @@ module.exports = function(socket, numPlayers) {
 
 		// Client finished his turn
 		socket.on('turnFinished', function(party, userId) {
-			/*var timeout = 1000;
+			var index = 1,
+				timeout = 4000;
+			
+			// Perform all AI player's attacks
+			var attackPoolHelper = function() {
+				AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party).then(function() {
+					Q.delay(timeout).done(function() {
+						index++;
+						
+						updatePartyTurn(party);
+						socket.emit('updateParty', party);
+						
+						// Checks after each AI player's turn if client has been wiped out
+						if (risk.checkWipedOutPlayer(userId)) {
+							socket.emit('losser');
+							return;
+						}
 
-			// Clousere for async loop
-			var aiGame = function(i) {
-				var index = i;
-
-				return function() {
-					var defer = Q.defer();
-
-					updatePartyTurn(party);
-					socket.emit('updateParty', party);
-
-					// After each attack
-					AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party).then(function() {
-						console.log('CALLBACK - PLAYER FINISHED ', this.players[index].id);
-						defer.resolve();
-					});
-
-					// After all AI players had their turn
-					if (index === this.size - 1) {
-						risk.turn++;
-
-						setTimeout(function() {
-							updatePartyTurn(party)
-							socket.emit('updateParty', party);
-							socket.emit('turnStarted', risk.turn);
-						}, 1500);
-					}
-
-					return defer.promise;
-				}.bind(this);
-			};
-
+						if (index < this.size) {
+							// Call the helper until all AI players had their turn
+							attackPoolHelper();
+						} else {
+							Q.delay(1000).done(function() {
+								risk.turn++;
+								socket.emit('turnStarted', risk.turn);
+							});
+						}
+					}.bind(this));
+				}.bind(this));
+			}.bind(this);
+			
 			// Check for winning condition
 			if (risk.checkWinningCondition(userId)) {
 				socket.emit('winner');
 				return;
 			}
-
-			// Exclude solo player
-			for (var i = 1; i < this.size; i++) {
-				// Initialize the outer method with the iterator in memory
-				// Inner method will be trigger by the setTimeout
-				setTimeout(aiGame.bind(this)(i), timeout);
-				timeout += 1000;
-			}*/
-			var index = 1;
-				AIPlayer.executeAttackPool(socket, this.players[1].id, risk, party).then(function() {
-					console.log('CALLBACK');
-
-				});
-
-
-/*			var attackPoolHelper = function() {
-				console.log('attackPoolHelper called', index);
-				AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party).then(function() {
-console.log('CALLBACK', index, this.size);
-
-					index++;
-console.log(index, this.size);
-					if (index < this.size) {
-						attackPoolHelper();
-					} else {
-						console.log('all players finished');
-					}
-				});
-			}.bind(this);
-
-			attackPoolHelper();*/
+			
+			updatePartyTurn(party);
+			socket.emit('updateParty', party);
+			
+			// Executes the attack helper
+			attackPoolHelper();
 								
-
 		}.bind(this));
 	};
 
