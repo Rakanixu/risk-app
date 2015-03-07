@@ -5,6 +5,20 @@
  */
 var MapGraph = function() {
 	return {
+		//debug data for AI players - START
+		/*'alaska': {
+			link: ['northwest', 'alberta'],
+			continent: 'northamerica'
+		},
+		'northwest': {
+			link: ['alaska', 'alberta'],
+			continent: 'northamerica'
+		},
+		'alberta': {
+			link: ['alaska', 'northwest'],
+			continent: 'northamerica'
+		}*/
+		//debug data for AI players - END
 		'alaska': {
 			link: ['kamchatka', 'northwest', 'alberta'],
 			continent: 'northamerica'

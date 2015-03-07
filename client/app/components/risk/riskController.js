@@ -67,7 +67,8 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 	 */	
 	Socket.on('applyMovement', function(dicesResult, graph, regions, party) {
 		var region1 = regions.split(',')[0],
-			region2 = regions.split(',')[1];
+			region2 = regions.split(',')[1],
+			dialogInstance = null;
 
 		Risk.setGraph(graph);
 		Handshake.setConfig({
@@ -85,7 +86,8 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 				$scope.reg2 = region2;
 				$scope.attackingDices = dicesResult.attackingDices;
 				$scope.defendingDices = dicesResult.defendingDices;
-				ngDialog.open({ 
+
+				dialogInstance = ngDialog.open({ 
 					template: 'client/app/components/errorDialogs/diceResult.html',
 					scope: $scope,
 					overlay: false,
@@ -102,7 +104,7 @@ app.controller('RiskController', function($scope, $timeout, $window, Handshake, 
 			$scope.updateRegionTo = region2;
 			// Result is shown for 4 sec. 
 			$timeout(function() {
-				ngDialog.close();
+				dialogInstance.close();
 				$scope.updateRegionFrom = null;
 				$scope.updateRegionTo = null;
 				$scope.showDicesResult = false;

@@ -87,6 +87,7 @@ module.exports = function(io, roomName, numPlayers, rooms) {
 	
 		var initGame = function(party) {
 			this.clientSockets[turnToken].emit('turnStarted', risk.turn);
+			
 			this.clientSockets[turnToken].on('applyMovementToParty', function(dicesResult, graph, regions, party, userId) {
 				risk.graph = graph;
 				
