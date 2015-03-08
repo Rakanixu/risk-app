@@ -243,7 +243,11 @@ module.exports = function() {
 	
 	// Checks if there is a good reorganization movement
 	var checkWorthlyReorganization = function(risk, userId) {
-		var worthlyReorganization = {
+		var secondeNode = {
+				ownsSecondNodes: false,
+				fromRegion: null
+			},	
+			worthlyReorganization = {
 			isWorthly: false,
 			fromRegion: null,
 			toRegion: null
@@ -259,43 +263,50 @@ module.exports = function() {
 			
 			return true;
 		};
-
-		for (var region in risk.graph) {
-			// Find a region where the AI player is the owner with a size army greater than 1 
-			if (risk.graph[region].owner === userId && risk.graph[region].armySize > 1) {
-				var connectedRegions = risk.graph[region].link;
-				
-				// Checks all surrounded regions belongs to the same AI player
-				if (connectedRegionsOwnership(connectedRegions)) {
-					// Iterates connected regions
-					console.log('suroounded by itself ', region)
-					for (var i = 0; i < connectedRegions.length; i++) {
-						var ownedConnectedRegions = risk.graph[connectedRegions[i]].link;
-						console.log('--', ownedConnectedRegions[i], risk.graph[ownedConnectedRegions[i]].owner, userId)
-						// Checks that those regions belongs to the AI player
-						if (risk.graph[ownedConnectedRegions[i]].owner === userId) {
-							var ownedConnectedRegionsWithExit = risk.graph[ownedConnectedRegions[i]].link;
+		
+		try {
+			for (var region in risk.graph) {
+				// Find a region where the AI player is the owner with a size army greater than 1 
+				if (risk.graph[region].owner === userId && risk.graph[region].armySize > 1) {
+					var connectedRegions = risk.graph[region].link;
+					
+					// Checks all surrounded regions belongs to the same AI player
+					if (connectedRegionsOwnership(connectedRegions)) {
+						// Iterates connected regions
+						for (var i = 0; i < connectedRegions.length; i++) {
+							var ownedConnectedRegions = risk.graph[connectedRegions[i]].link;
 							
-							// Iterates connected regions owned by the AI player
-							for (var j = 0; j < ownedConnectedRegionsWithExit.length; j++) {
-								console.log('----', risk.graph[ownedConnectedRegionsWithExit[i]].owner, userId)
-								
+							// Iterates second level connected regions
+							for (var j = 0; j < ownedConnectedRegions.length; j++) {
 								// Checks that second level connected region belongs to another player
-								if (risk.graph[ownedConnectedRegionsWithExit[i]].owner !== userId) {
+								if (risk.graph[ownedConnectedRegions[j]].owner !== risk.graph[connectedRegions[i]].owner) {
 									worthlyReorganization.isWorthly = true;
 									worthlyReorganization.fromRegion = region;
 									worthlyReorganization.toRegion = connectedRegions[i];
 
 									return worthlyReorganization;
+								} else {
+									secondeNode.ownsSecondNodes = true;
+									secondeNode.fromRegion = region;
 								}
 							}
 						}
 					}
 				}
 			}
+		} catch(error) {
+			console.log('ERROR - checkWorthlyReorganization: ' + error);
 		}
-
-		return worthlyReorganization;	
+		
+		// AI player controls all regions 2 position ahead the region with spare army size
+		// Move the troops to another region. Next iteration enemy regions could be 2 positions ahead
+		if (secondeNode.ownsSecondNodes) {
+			worthlyReorganization.isWorthly = true;
+			worthlyReorganization.fromRegion = secondeNode.fromRegion;
+			worthlyReorganization.toRegion = risk.graph[secondeNode.fromRegion].link[0];
+		}
+		
+		return worthlyReorganization;
 	};		
 
 	// Executes an attack
@@ -438,7 +449,6 @@ module.exports = function() {
 				
 			Q.delay(wait).done(function() {
 				worthlyReorganization = checkWorthlyReorganization(risk, userId);
-				console.log(worthlyReorganization);
 				
 				if (worthlyReorganization.isWorthly) {
 					Q.delay(timeout).done(function() {
