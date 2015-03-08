@@ -7,6 +7,7 @@ var Q = require('q');
   */
 module.exports = function() {
 	var humanPlayerId = null,
+		lastRegionHumanPlayer = null,
 		musteringRatio = 3,
 		continents = {
 			northamerica: {
@@ -65,33 +66,31 @@ module.exports = function() {
 	
 	// Execute the set up phase 
 	var setUp = function(risk, userId) {
-		// NOT DOING ANY TYPE OF PRIORITY PLACEMENT - REFACTOR
-		if (checkEmptyRegion(risk)) {
-			for (var region in risk.graph) {
-				// Check for a free region
-				if (risk.graph[region].owner === undefined) {
-					// Gives priority to regions which belongs to small continents
-					if (risk.graph[region].continent === continents.southamerica.name) {
-						return placeArmy(userId, risk, region);
-					} else if (risk.graph[region].continent === continents.oceania.name) {
-						return placeArmy(userId, risk, region);
-					} else if (risk.graph[region].continent === continents.africa.name) {
-						return placeArmy(userId, risk, region);
-					} else if (risk.graph[region].continent === continents.northamerica.name) {
-						return placeArmy(userId, risk, region);
-					} else if (risk.graph[region].continent === continents.europe.name) {
-						return placeArmy(userId, risk, region);
-					} else if (risk.graph[region].continent === continents.asia.name) {
-						return placeArmy(userId, risk, region);
-					}
+		var bestRegions = risk.graph[lastRegionHumanPlayer].link;
+		
+		// Place armies on the map depending on the ownership of the regions
+		var setUpHelper = function(ownership) {
+			// AI players tries to set armies in regions near the human player
+			for (var i = 0; i < bestRegions.length; i++) {
+				if (risk.graph[bestRegions[i]].owner === ownership) {
+					return placeArmy(userId, risk, bestRegions[i]);
 				}
 			}
-		} else {
+			
+			// No best region available, place army on first allowed region
 			for (var region in risk.graph) {
-				if (risk.graph[region].owner === userId) {
+				if (risk.graph[region].owner === ownership) {
 					return placeArmy(userId, risk, region);
-				}
-			}
+				}			
+			}		
+		};
+
+		if (checkEmptyRegion(risk)) {
+			// Place army on empty region
+			return setUpHelper(undefined);
+		} else {
+			// Place army on AI player regions
+			return setUpHelper(userId);		
 		}
 	};
 
@@ -226,6 +225,78 @@ module.exports = function() {
 		}
 		return losses;
 	};
+	
+	// Sends the reorganization event
+	var reorganization = function(socket, risk, worthlyReorganization, party, userId) {
+		var regions = worthlyReorganization.fromRegion + ',' + worthlyReorganization.toRegion,
+			fromRegionArmySize = risk.graph[worthlyReorganization.fromRegion].armySize,
+			toRegionArmySize = risk.graph[worthlyReorganization.toRegion].armySize;
+
+		if (risk.graph[worthlyReorganization.fromRegion].owner === userId &&
+				risk.graph[worthlyReorganization.toRegion].owner === userId) {
+			risk.graph[worthlyReorganization.fromRegion].armySize = 1; 
+			risk.graph[worthlyReorganization.toRegion].armySize = toRegionArmySize + fromRegionArmySize - 1;
+			
+			socket.emit('applyMovement', null, risk.graph, regions, party);
+		}
+	};
+	
+	// Checks if there is a good reorganization movement
+	var checkWorthlyReorganization = function(risk, userId) {
+		var worthlyReorganization = {
+			isWorthly: false,
+			fromRegion: null,
+			toRegion: null
+		};
+		
+		// Returns true if all regions belongs to the given user
+		var connectedRegionsOwnership = function(regions) {
+			for (var i = 0; i < regions.length; i++) {
+				if (risk.graph[regions[i]].owner !== userId) {
+					return false;
+				}
+			}
+			
+			return true;
+		};
+
+		for (var region in risk.graph) {
+			// Find a region where the AI player is the owner with a size army greater than 1 
+			if (risk.graph[region].owner === userId && risk.graph[region].armySize > 1) {
+				var connectedRegions = risk.graph[region].link;
+				
+				// Checks all surrounded regions belongs to the same AI player
+				if (connectedRegionsOwnership(connectedRegions)) {
+					// Iterates connected regions
+					console.log('suroounded by itself ', region)
+					for (var i = 0; i < connectedRegions.length; i++) {
+						var ownedConnectedRegions = risk.graph[connectedRegions[i]].link;
+						console.log('--', ownedConnectedRegions[i], risk.graph[ownedConnectedRegions[i]].owner, userId)
+						// Checks that those regions belongs to the AI player
+						if (risk.graph[ownedConnectedRegions[i]].owner === userId) {
+							var ownedConnectedRegionsWithExit = risk.graph[ownedConnectedRegions[i]].link;
+							
+							// Iterates connected regions owned by the AI player
+							for (var j = 0; j < ownedConnectedRegionsWithExit.length; j++) {
+								console.log('----', risk.graph[ownedConnectedRegionsWithExit[i]].owner, userId)
+								
+								// Checks that second level connected region belongs to another player
+								if (risk.graph[ownedConnectedRegionsWithExit[i]].owner !== userId) {
+									worthlyReorganization.isWorthly = true;
+									worthlyReorganization.fromRegion = region;
+									worthlyReorganization.toRegion = connectedRegions[i];
+
+									return worthlyReorganization;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return worthlyReorganization;	
+	};		
 
 	// Executes an attack
 	var excuteAttack = function(socket, userId, risk, fromRegion, toRegion, party) {
@@ -273,6 +344,9 @@ module.exports = function() {
 	return {
 		setHumanPlayerId: function(id) {
 			humanPlayerId = id;
+		},
+		setLastRegionHumanPlayer: function(region) {
+			lastRegionHumanPlayer = region;
 		},
 		executeSetUp: function(risk, userId) {
 			setUp(risk, userId);
@@ -355,6 +429,28 @@ module.exports = function() {
 			}
 
 			return attackPoolDefer.promise;
+		},
+		executeReorganization: function(socket, risk, userId, party) {
+			var wait = 4100,
+				timeout = 1010,
+				reorganizationDefer = Q.defer(),
+				worthlyReorganization = null;
+				
+			Q.delay(wait).done(function() {
+				worthlyReorganization = checkWorthlyReorganization(risk, userId);
+				console.log(worthlyReorganization);
+				
+				if (worthlyReorganization.isWorthly) {
+					Q.delay(timeout).done(function() {
+						reorganization(socket, risk, worthlyReorganization, party, userId);
+						reorganizationDefer.resolve();
+					});			
+				} else {
+					reorganizationDefer.resolve();
+				}
+			});
+
+			return reorganizationDefer.promise;
 		}
 	}
 };

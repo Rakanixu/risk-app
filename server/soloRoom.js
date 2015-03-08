@@ -47,7 +47,7 @@ module.exports = function(socket, numPlayers) {
 		socket.on('turnSetupFinished', function(graph, region, party) {
 			var timeout = 1000;
 
-			// Clousere for async loop
+			// Closure for async loop
 			var aiSetUp = function(i) {
 				var index = i;
 
@@ -75,6 +75,7 @@ module.exports = function(socket, numPlayers) {
 
 			risk.graph = graph;
 			risk.lastRegion = region;
+			AIPlayer.setLastRegionHumanPlayer(region);
 
 			updatePartyTurn(party);
 			socket.emit('updateGraph', risk.graph, risk.lastRegion, party);
@@ -94,12 +95,16 @@ module.exports = function(socket, numPlayers) {
 
 		socket.on('applyMovementToParty', function(dicesResult, graph, regions, party, userId) {
 			risk.graph = graph;
+			
+			// Sets the last region human player has attacked as "hot" region
+			// AI players will try to muster around this node and its linked nodes
+			AIPlayer.setLastRegionHumanPlayer(regions.split(',')[1]);
 
-			// Checks if attacked AiIplayer lost all his regions
+			// Checks if attacked AI player lost all his regions
 			if (risk.graph[regions.split(',')[1]].owner === userId) {
 				for (var i = 1; i < this.players.length; i++) {
 					if (this.players[i].id !== userId && risk.checkWipedOutPlayer(this.players[i].id)) {
-						// Sends losser event and remove user from room
+						// Sends loser event and remove user from room
 						this.players.splice(i, 1);
 						party.splice(i, 1);
 						this.size--;
@@ -113,7 +118,7 @@ module.exports = function(socket, numPlayers) {
 		// Client finished his turn
 		socket.on('turnFinished', function(party, userId) {
 			var index = 1,
-				timeout = 4100;
+				timeout = 100;
 			
 			// Perform all AI player's attacks
 			var aiPlayerHelper = function() {
@@ -122,7 +127,10 @@ module.exports = function(socket, numPlayers) {
 				AIPlayer.executeMustering(socket, risk, this.players[index].id).then(function() {
 					// Returns a promise allowing chaining all async operations
 					return AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party);
-				// Once attacking phase had finished, check lossing conditions and call next AI player's actions
+				// Once attacking phase had finished, reorganization phase begin
+				}.bind(this)).then(function() {
+					return AIPlayer.executeReorganization(socket, risk, this.players[index].id, party);
+				// Once reorganization phase had finished, check losing conditions and call next AI player's actions					
 				}.bind(this)).then(function() {
 					Q.delay(timeout).done(function() {
 						index++;
@@ -140,7 +148,7 @@ module.exports = function(socket, numPlayers) {
 							// Recursive calls until all AI players had their turn
 							aiPlayerHelper();
 						} else {
-							Q.delay(1000).done(function() {
+							Q.delay(timeout).done(function() {
 								risk.turn++;
 								socket.emit('turnStarted', risk.turn);
 							});
