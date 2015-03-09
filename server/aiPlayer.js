@@ -70,19 +70,31 @@ module.exports = function() {
 		
 		// Place armies on the map depending on the ownership of the regions
 		var setUpHelper = function(ownership) {
-			// AI players tries to set armies in regions near the human player
+			var availableHotRegions = [],
+				availableColdRegions = [];
+
+			// AI players tries to set armies in regions near the human player 2 out of 3 times
 			for (var i = 0; i < bestRegions.length; i++) {
-				if (risk.graph[bestRegions[i]].owner === ownership) {
+				if (risk.graph[bestRegions[i]].owner === ownership && Math.floor(Math.random() * 3)) {
 					return placeArmy(userId, risk, bestRegions[i]);
 				}
 			}
 			
-			// No best region available, place army on first allowed region
+			// No best region available, place army on random allowed region
+			// Prioritize "hot" regions 
 			for (var region in risk.graph) {
-				if (risk.graph[region].owner === ownership) {
-					return placeArmy(userId, risk, region);
-				}			
+				if (risk.graph[region].owner === ownership && risk.graph[region].armySize > 3) {
+					availableHotRegions.push(region);
+				} else if (risk.graph[region].owner === ownership && risk.graph[region].armySize <= 3) {
+					availableColdRegions.push(region)
+				}
 			}		
+
+			if (availableHotRegions.length > 1) {
+				return placeArmy(userId, risk, availableHotRegions[Math.floor(Math.random() * (availableHotRegions.length - 1))]);
+			} else {
+				return placeArmy(userId, risk, availableColdRegions[Math.floor(Math.random() * (availableColdRegions.length - 1))]);
+			}
 		};
 
 		if (checkEmptyRegion(risk)) {
@@ -102,6 +114,14 @@ module.exports = function() {
 			toRegion: null
 		};
 
+		var setWorthlyAttack = function(region, toRegion) {
+			worthlyAttack.isWorthly = true;
+			worthlyAttack.fromRegion = region;
+			worthlyAttack.toRegion = toRegion;
+
+			return worthlyAttack;
+		};
+
 		for (var region in risk.graph) {
 			// Find a region where the AI player is the owner with a size army greater than 3 (3 attack dices available)
 			if (risk.graph[region].owner === userId && risk.graph[region].armySize > 3) {
@@ -109,14 +129,13 @@ module.exports = function() {
 				for (var linkedRegion in risk.graph[region].link) {
 					var toRegion = risk.graph[region].link[linkedRegion];
 
-					// AI Players just attack the client
 					if (risk.graph[toRegion]) {
+						// AI Players tries to attack human player
 						if (risk.graph[toRegion].owner === humanPlayerId) {
-							worthlyAttack.isWorthly = true;
-							worthlyAttack.fromRegion = region;
-							worthlyAttack.toRegion = toRegion;
-
-							return worthlyAttack;
+							return setWorthlyAttack(region, toRegion);
+						// Half of the times AI player wsill attack other AI players
+						} else if (risk.graph[toRegion].owner !== risk.graph[region].owner && Math.floor(Math.random() * 2)) {
+							return setWorthlyAttack(region, toRegion);
 						}
 					}
 				}
@@ -278,6 +297,8 @@ module.exports = function() {
 							
 							// Iterates second level connected regions
 							for (var j = 0; j < ownedConnectedRegions.length; j++) {
+								console.log('--', connectedRegions[i], ownedConnectedRegions[j])
+
 								// Checks that second level connected region belongs to another player
 								if (risk.graph[ownedConnectedRegions[j]].owner !== risk.graph[connectedRegions[i]].owner) {
 									worthlyReorganization.isWorthly = true;
@@ -449,7 +470,7 @@ module.exports = function() {
 				
 			Q.delay(wait).done(function() {
 				worthlyReorganization = checkWorthlyReorganization(risk, userId);
-				
+				console.log(userId, worthlyReorganization)
 				if (worthlyReorganization.isWorthly) {
 					Q.delay(timeout).done(function() {
 						reorganization(socket, risk, worthlyReorganization, party, userId);

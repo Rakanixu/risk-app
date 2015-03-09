@@ -129,6 +129,7 @@ module.exports = function(socket, numPlayers) {
 					return AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party);
 				// Once attacking phase had finished, reorganization phase begin
 				}.bind(this)).then(function() {
+					console.log('REORGANIZATION ', this.players[index].id)
 					return AIPlayer.executeReorganization(socket, risk, this.players[index].id, party);
 				// Once reorganization phase had finished, check losing conditions and call next AI player's actions					
 				}.bind(this)).then(function() {
