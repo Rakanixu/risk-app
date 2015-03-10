@@ -5,60 +5,6 @@
  */
 var MapGraph = function() {
 	return {
-		//debug data for AI players - START
-		/*'alaska': {
-			link: ['northwest', 'alberta'],
-			continent: 'northamerica'
-		},
-		'northwest': {
-			link: ['alaska', 'alberta', 'ontario', 'greenland'],
-			continent: 'northamerica'
-		},
-		'alberta': {
-			link: ['alaska', 'northwest', 'ontario', 'westernuuee'],
-			continent: 'northamerica'
-		},
-		'greenland': {
-			link: ['northwest', 'ontario', 'quebec'],
-			continent: 'northamerica'
-		},
-		'ontario': {
-			link: ['northwest', 'alberta', 'westernuuee', 'easternuuee', 'quebec', 'greenland'],
-			continent: 'northamerica'
-		},
-		'quebec': {
-			link: ['ontario', 'easternuuee', 'greenland'],
-			continent: 'northamerica'
-		},
-		'westernuuee': {
-			link: ['alberta', 'ontario', 'easternuuee', 'centralamerica'],
-			continent: 'northamerica'
-		},
-		'easternuuee': {
-			link: ['centralamerica', 'westernuuee', 'ontario', 'quebec'],
-			continent: 'northamerica'
-		},
-		'centralamerica': {
-			link: ['westernuuee', 'easternuuee', 'venezuela'],
-			continent: 'northamerica'
-		},
-		'venezuela': {
-			link: ['centralamerica', 'peru', 'brazil'],
-			continent: 'southamerica'
-		},
-		'peru': {
-			link: ['venezuela', 'brazil', 'argentina'],
-			continent: 'southamerica'
-		},
-		'brazil': {
-			link: ['venezuela', 'peru', 'argentina'],
-			continent: 'southamerica'
-		},
-		'argentina': {
-			link: ['peru', 'brazil'],
-			continent: 'southamerica'
-		}*/
-		//debug data for AI players - END
 		'alaska': {
 			link: ['kamchatka', 'northwest', 'alberta'],
 			continent: 'northamerica'

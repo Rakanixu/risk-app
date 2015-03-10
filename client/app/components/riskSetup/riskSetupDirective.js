@@ -42,21 +42,20 @@ app.directive('riskSetupDirective', function($location, $compile, Risk, Handshak
 			knights = Math.floor(possibleKnights / knightVal); // Number of knigts
 			soldiers = possibleKnights % knightVal; // Number of soldiers
 
-			// $scope is not modified or binded - no need for $compile
 			$element.find(target + region).empty();
 			for (i = 0; i < cannons; i++) {
 				styleMargin = 'margin-left:' + margin + 'px';
-				$element.find(target + region).append('<img class="cannon" src="' + cannonPath + '" style="' + style + styleMargin + '"/>');
+				$element.find(target + region).append($compile('<img ng-click="onclick($event)" title="' + region + '" class="cannon" src="' + cannonPath + '" style="' + style + styleMargin + '"/>')($scope));
 				margin += 30;
 			}
 			for (i = 0; i < knights; i++) {
 				styleMargin = 'margin-left:' + margin + 'px';
-				$element.find(target + region).append('<img src="' + knightPath + '" style="' + style + styleMargin + '"/>');								
+				$element.find(target + region).append($compile('<img ng-click="onclick($event)" title="' + region + '" src="' + knightPath + '" style="' + style + styleMargin + '"/>')($scope));								
 				margin += 15;
 			}
 			for (i = 0; i < soldiers; i++) {
 				styleMargin = 'margin-left:' + margin + 'px';
-				$element.find(target + region).append('<img src="' + soldierPath + '" style="' + style + styleMargin + '"/>');
+				$element.find(target + region).append($compile('<img ng-click="onclick($event)" title="' + region + '" src="' + soldierPath + '" style="' + style + styleMargin + '"/>')($scope));
 				margin += 15;
 			}
 

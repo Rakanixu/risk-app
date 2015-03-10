@@ -117,11 +117,10 @@ module.exports = function(socket, numPlayers) {
 
 		// Client finished his turn
 		socket.on('turnFinished', function(party, userId) {
-			var index = 1,
-				timeout = 100;
+			var timeout = 200;
 			
 			// Perform all AI player's attacks
-			var aiPlayerHelper = function() {
+			var aiPlayerHelper = function(index) {
 				// Executes mustering phase
 				// Once the muster phase had finished, attacking phase begin
 				AIPlayer.executeMustering(socket, risk, this.players[index].id).then(function() {
@@ -129,13 +128,10 @@ module.exports = function(socket, numPlayers) {
 					return AIPlayer.executeAttackPool(socket, this.players[index].id, risk, party);
 				// Once attacking phase had finished, reorganization phase begin
 				}.bind(this)).then(function() {
-					console.log('REORGANIZATION ', this.players[index].id)
 					return AIPlayer.executeReorganization(socket, risk, this.players[index].id, party);
 				// Once reorganization phase had finished, check losing conditions and call next AI player's actions					
 				}.bind(this)).then(function() {
-					Q.delay(timeout).done(function() {
-						index++;
-						
+					Q.delay(timeout).done(function() {			
 						updatePartyTurn(party);
 						socket.emit('updateParty', party);
 						
@@ -145,9 +141,10 @@ module.exports = function(socket, numPlayers) {
 							return;
 						}
 
+						index++;
 						if (index < this.size) {
 							// Recursive calls until all AI players had their turn
-							aiPlayerHelper();
+							aiPlayerHelper(index);
 						} else {
 							Q.delay(timeout).done(function() {
 								risk.turn++;
@@ -168,7 +165,7 @@ module.exports = function(socket, numPlayers) {
 			socket.emit('updateParty', party);
 			
 			// Executes the attack helper
-			aiPlayerHelper();
+			aiPlayerHelper(1);
 								
 		}.bind(this));
 	};
