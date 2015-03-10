@@ -38,8 +38,39 @@ module.exports = function(socket, numPlayers) {
 		socket.emit('roomTotalUsers', this.size);
 		// Init set up phase
 		setTimeout(function() {
+			initChat.call(this);
 			initSetUp.call(this);
 		}.bind(this), 2500);
+	};
+
+	var initChat = function() {
+		var msgs = [
+			"Don't play stupid with me...I'm better at it.",
+			"People say nothing is impossible, but I do nothing every day.",
+			"I see your face when I am dreaming. That's why I always wake up screaming.",
+			"Kind, intelligent, loving and hot. This describes everything you are not.",
+			"Don't think of yourself as an ugly person. Think of yourself as a beautiful monkey!",
+			"Please don't interupt me while im ignoring you.",
+			"Smile, it makes people wonder what you're thinking.",
+			"Alcohol doesn't solve any problems, but then again, neither does milk.",
+			"Smile, and the world will smile with you. Laugh and they'll all think your on drugs."
+		];
+
+		socket.on('partyMessage', function(msg, userId) {
+			var index = Math.floor((Math.random() * this.players.length - 1) + 2),
+				randomMessage = msgs[Math.floor(Math.random() * msgs.length - 1)];
+
+			if (index <= 0) {
+				index = 1;
+			} else if (index >= this.players.length) {
+				index = this.players.length - 1;
+			}
+
+			// Message from client is forwarded
+			socket.emit('broadcastedPartyMessage', msg, userId);
+			// Random sentences is send to client as answer
+			socket.emit('broadcastedPartyMessage', randomMessage, this.players[index].id);
+		}.bind(this));			
 	};
 
 	var initSetUp = function() {
