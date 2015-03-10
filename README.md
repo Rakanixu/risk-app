@@ -1,5 +1,5 @@
 # risk-app
-Risk game board online. Concurrent rooms and players.
+Risk game board online. Concurrent rooms and players. Support for solo games.
 
 App is deployed on heroku: https://risk-app-online.herokuapp.com/
 
